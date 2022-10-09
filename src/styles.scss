@@ -1,0 +1,254 @@
+@import './shared.scss';
+@import 'style/ui-size.scss';
+
+html {
+	font-family: $font-family;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	user-select: none;
+}
+
+body {
+	height: 100%;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
+h1 {
+	font-weight: normal;
+	margin: 0;
+}
+
+h2 {
+	font-weight: normal;
+	margin: 0;
+}
+
+h3 {
+	font-weight: normal;
+	margin: 0;
+}
+
+a {
+	text-decoration: none;
+	color: blue;
+}
+
+button {
+	@include input;
+	cursor: pointer;
+	display: flex;
+	flex-direction: row;
+	align-items: baseline;
+	justify-content: center;
+	background-color: #eee;
+
+	&[disabled], &.disabled {
+		opacity: .5;
+		cursor: default;
+	}
+	
+	&:focus {
+		@include input-focus;
+	}
+	
+	&.active, &:active {
+		box-shadow: inset 1px 1px 3px black;
+		border-color: black;
+		
+		&[disabled],&.disabled {
+			box-shadow: none;
+			border-color: #808080;
+		}
+	}
+}
+
+input {
+	@include input;
+	color: #4080ff;
+
+	&:focus {
+		@include input-focus;
+	}
+	
+	&[type=number]{
+		text-align: right;
+	}
+}
+
+textarea {
+	@include input;
+	color: #4080ff;
+
+	&.code {
+		font-family: monospace;
+	}
+	
+	&:focus {
+		@include input-focus;
+	}
+}
+
+select {
+	@include input;
+
+	&:focus {
+		@include input-focus;
+	}
+}
+
+label {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+form, .form {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
+img.overlay {
+	position: absolute;
+}
+
+.image-container {
+	box-sizing: content-box;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+svg.canvas {
+	position: absolute;
+	border: 1px solid black;
+	background-image: url('/assets/images/background.png');
+	
+	circle.transform-handle {
+		cursor: move;
+		fill: white;
+		stroke: green;
+		stroke-width: 2;
+		vector-effect: non-scaling-stroke;
+	}
+	
+	rect.selection, circle.selection {
+		@include dashed-black-line;
+		stroke: #ff4040;
+		fill: #ff8080;
+		fill-opacity: .2;
+	}
+	
+	line.selection {
+		@include dashed-black-line;
+		stroke: #ff4040;
+	}
+	
+	rect.measure, circle.measure {
+		@include dashed-black-line;
+		stroke: #408040;
+		fill: none;
+	}
+	
+	line.measure {
+		@include dashed-black-line;
+		stroke: #408040;
+	}
+}
+
+.main-columns {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	flex-grow: 1;
+	flex-shrink: 1;
+	
+	& > .grow {
+		flex-grow: 1;
+		flex-shrink: 1;
+	}
+}
+
+.section {
+
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	
+	&.grow {
+		flex-grow: 1;
+		flex-shrink: 1;
+	}
+}
+
+.section-rows {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	
+	&.form {
+		padding: $spacing;
+		
+		.section > *:nth-child(n + 2) {
+			margin-top: $spacing;
+		}
+	}
+	
+	& > *:nth-child(n + 2) {
+		margin-top: $spacing;
+	}
+}
+
+.dropdown-menu-group {
+	
+	&:nth-child(n + 2) {
+		border-top: 1px solid #ccc;
+	}
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+
+	&:nth-child(n + 2) {
+		margin-top: $form-spacing;
+	}	
+	
+	& > input, & > select, & > textarea, & > .input-group {
+		align-self: stretch;
+	}
+	
+	input[size], input[type=number][max] {
+		align-self: flex-start;
+	}
+}
+
+.input-group {
+	@include input-group;
+}
+
+.button-list {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	
+	&.right {
+		justify-content: flex-end;
+	}
+	
+	& > button {
+		padding-left: $form-spacing;
+		padding-right: $form-spacing;
+	}
+	
+	& > button:nth-child(n + 2) {
+		margin-left: $form-spacing;
+	}
+}

@@ -1,0 +1,13 @@
+@import '../../../shared.scss';
+
+.array {
+	min-width: 50rem;
+	min-height: 10rem;
+	display: grid;
+	grid-template-columns: repeat(6, auto);
+	grid-gap: $spacing;
+	align-items: center;
+	justify-items: stretch;
+	justify-content: start;
+	align-content: start;
+}

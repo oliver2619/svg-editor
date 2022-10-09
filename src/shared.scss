@@ -1,0 +1,64 @@
+$font-family: Segoe UI, sans-serif;
+$font-size: 11pt;
+$font-size-small: $font-size * .8;
+$spacing: 0.25rem;
+$form-spacing: .5rem;
+$input-border-radius: 2px;
+$z-index-panel: 10;
+$z-index-dialog-background: 20;
+$z-index-dialog: 30;
+$color-active-border: #80c0ff;
+$color-active-background: #a0e0ff;
+$dialog-shadow-color: #808080;
+$context-menu-spacing: .5rem;
+
+@mixin input {
+	outline: none;
+	border: 1px solid #808080;
+	border-radius: $input-border-radius;
+	padding: $spacing;
+	font-family: $font-family;
+}
+
+@mixin input-focus {
+	outline: 2px solid $color-active-border;
+	border-color: $color-active-border;
+}
+
+@mixin dashed-black-line {
+	stroke: black;
+	stroke-width: 1;
+	stroke-dasharray: 7 3;
+	vector-effect: non-scaling-stroke;	
+}
+
+@mixin input-group {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	
+	span, div, label {
+		padding: $spacing;
+	}
+}
+
+.toolbar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: $spacing;
+	
+	.toolbar-group {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		
+		&:nth-child(n + 2) {
+			margin-left: $spacing * 2;
+		}
+	}
+
+	& > button, .toolbar-group > button {
+		padding: $spacing $spacing;
+	}
+}

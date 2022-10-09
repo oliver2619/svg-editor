@@ -1,0 +1,64 @@
+@import '../../shared.scss';
+
+:host {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 20rem;
+}
+
+.tree {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	position: relative;
+	align-self: stretch;
+	flex-grow: 1;
+	flex-shrink: 1;
+	overflow: auto;
+	border: 1px solid black;
+	padding: $spacing;
+	background-color: white;
+	
+	& > ul {
+		position: absolute;
+	}
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	ul {
+		margin-left: 8px;
+		border-left: 1px dotted black;
+		padding-left: 11px;
+	}
+}
+
+li {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+	
+	& > *:nth-child(n + 2) {
+		margin-left: $spacing;
+	}
+	
+	label {
+		flex-grow: 1;
+		flex-shrink: 1;
+	}
+	
+	a {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+}

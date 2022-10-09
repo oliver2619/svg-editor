@@ -1,0 +1,8 @@
+<se-dialog title="{{'document.download.title' | text}}" buttons="ok cancel" [additional-buttons]="additionalButtons" [ok-enabled]="okEnabled" ok-text="{{'document.download' | text}}" (ok)="download()" (cancel)="cancel()">
+	<form [formGroup]="formGroup">
+		<div class="form-group">
+			<textarea formControlName="source" rows="20" cols="100" class="code" spellcheck="false"></textarea>
+		</div>
+	</form>
+</se-dialog>
+<a #fileDownload target="_blank" style="position: absolute; visibility: hidden"></a> 

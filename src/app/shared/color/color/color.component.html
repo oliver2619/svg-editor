@@ -1,0 +1,47 @@
+<div class="row">
+	<div class="column">
+		<div class="picker">
+			<canvas width="256" height="256" seCanvasColorPicker [valueX]="x" [valueY]="y" [paint]="drawXY" [version]="version" orientation="both" (change)="onChangeXY($event)"></canvas>
+		</div>
+	</div>
+	<div class="column">
+		<form [formGroup]="formGroup">
+			<label><input type="radio" formControlName="mode" name="mode" value="red">&nbsp;R</label>
+			<canvas width="256" height="24" seCanvasColorPicker [valueX]="red" [paint]="drawR" [version]="version" orientation="horizontal" (change)="onChangeR($event)"></canvas>
+			<div class="input-group"><input type="number" formControlName="red" (change)="onInputR($event)" min="0" max="100"><span>%</span></div>
+			<label><input type="radio" formControlName="mode" name="mode" value="green">&nbsp;G</label>
+			<canvas width="256" height="24" seCanvasColorPicker [valueX]="green" [paint]="drawG" [version]="version" orientation="horizontal" (change)="onChangeG($event)"></canvas>
+			<div class="input-group"><input type="number" formControlName="green" (change)="onInputG($event)" min="0" max="100"><span>%</span></div>
+			<label><input type="radio" formControlName="mode" name="mode" value="blue">&nbsp;B</label>
+			<canvas width="256" height="24" seCanvasColorPicker [valueX]="blue" [paint]="drawB" [version]="version" orientation="horizontal" (change)="onChangeB($event)"></canvas>
+			<div class="input-group"><input type="number" formControlName="blue" (change)="onInputB($event)" min="0" max="100"><span>%</span></div>
+			<label><input type="radio" formControlName="mode" name="mode" value="hue">&nbsp;H</label>
+			<canvas width="256" height="24" seCanvasColorPicker [valueX]="hue / 6" [paint]="drawH" [version]="version" orientation="horizontal" (change)="onChangeH($event)"></canvas>
+			<div class="input-group"><input type="number" formControlName="hue" (change)="onInputH($event)" min="0" max="360"><span>°</span></div>
+			<label><input type="radio" formControlName="mode" name="mode" value="saturation">&nbsp;S</label>
+			<canvas width="256" height="24" seCanvasColorPicker [valueX]="saturation" [paint]="drawS" [version]="version" orientation="horizontal" (change)="onChangeS($event)"></canvas>
+			<div class="input-group"><input type="number" formControlName="saturation" (change)="onInputS($event)" min="0" max="100"><span>%</span></div>
+			<label><input type="radio" formControlName="mode" name="mode" value="brightness">&nbsp;V</label>
+			<canvas width="256" height="24" seCanvasColorPicker [valueX]="brightness" [paint]="drawV" [version]="version" orientation="horizontal" (change)="onChangeV($event)"></canvas>
+			<div class="input-group"><input type="number" formControlName="brightness" (change)="onInputV($event)" min="0" max="100"><span>%</span></div>
+			<label>A</label>
+			<canvas width="256" height="24" seCanvasColorPicker [valueX]="alpha" [paint]="drawA" [version]="version" orientation="horizontal" (change)="onChangeA($event)"></canvas>
+			<div class="input-group"><input type="number" formControlName="alpha" (change)="onInputG($event)" min="0" max="100"><span>%</span></div>
+			<label>#</label>
+			<div></div>
+			<div class="input-group"><input type="string" formControlName="html" (change)="onInputHTML($event)" size="6" maxlength="6" spellcheck="false"></div>
+		</form>
+	</div>
+</div>
+<div class="row">
+	<div class="column">
+		<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+			<rect #svgRect x="0" y="0" width="64" height="64"/>
+		</svg>
+	</div>
+	<div *ngIf="hasInitialColor" class="column">
+		<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+			<rect #svgOldRect x="0" y="0" width="48" height="48"/>
+		</svg>
+	</div>
+</div>

@@ -1,0 +1,16 @@
+<se-dialog title="{{'edit.settings' | text}}" buttons="ok cancel" [ok-enabled]="okEnabled" (ok)="ok()" (cancel)="cancel()">
+	<form [formGroup]="formGroup">
+		<div class="form-group">
+			<label for="undoSize" seText="edit.settings.undoHistorySize" [seAccessKey]="true"></label>
+			<input #focus type="number" id="undoSize" formControlName="undoSize" min="1">
+		</div>
+		<div class="form-group">
+			<label for="uiSize" seText="edit.settings.uiSize" [seAccessKey]="true"></label>
+			<select id="uiSize" formControlName="uiSize">
+				<option value="small" seText="size.small"></option>
+				<option value="medium" seText="size.medium"></option>
+				<option value="large" seText="size.large"></option>
+			</select>
+		</div>
+	</form>
+</se-dialog>

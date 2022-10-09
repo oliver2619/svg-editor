@@ -1,0 +1,55 @@
+@import '../../../../shared.scss';
+
+:host {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
+svg {
+	border: 1px solid black;
+	background: url('/assets/images/background.png');
+}
+
+canvas {
+	cursor: crosshair;
+	border: 1px solid black;
+	background: url('/assets/images/background.png');
+}
+
+form {
+	display: grid;
+	grid-template-columns: repeat(3, auto);
+	grid-gap: $spacing $spacing;
+	align-items: center;
+}
+
+.column {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	
+	&:nth-child(n + 2) {
+		margin-left: $spacing;
+	}
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	
+	&:nth-child(n + 2) {
+		margin-top: $spacing;
+	}
+}
+
+.picker {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	
+	& > *:nth-child(n + 2) {
+		margin-left: $spacing;
+	}
+}

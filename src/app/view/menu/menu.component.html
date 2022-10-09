@@ -1,0 +1,78 @@
+<div class="menu-bar">
+	<button #menuDocument type="button" seText="document"></button>
+	<button #menuEdit type="button" seText="edit"></button>
+	<button #menuSelection type="button" seText="selection"></button>
+	<button #menuView type="button" seText="view"></button>
+	<button #menuImage type="button" seText="image"></button>
+	<button #menuHelp type="button" seText="help"></button>
+</div>
+<se-dropdown [button]="menuDocument">
+	<se-context-menu>
+		<div class="dropdown-menu-group">
+			<se-context-menu-entry action="document.new"></se-context-menu-entry>
+			<se-context-menu-entry action="document.importSvg"></se-context-menu-entry>
+		</div>
+		<div class="dropdown-menu-group">
+			<se-context-menu-entry action="document.download"></se-context-menu-entry>
+		</div>
+		<div class="dropdown-menu-group">		
+			<se-context-menu-entry action="document.properties"></se-context-menu-entry>
+		</div>
+	</se-context-menu>
+</se-dropdown>
+<se-dropdown [button]="menuEdit">
+	<se-context-menu>
+		<div class="dropdown-menu-group">
+			<se-context-menu-entry action="edit.undo"></se-context-menu-entry>
+			<se-context-menu-entry action="edit.redo"></se-context-menu-entry>
+			<se-context-menu-entry action="edit.duplicate"></se-context-menu-entry>
+		</div>
+		<div class="dropdown-menu-group">
+			<se-context-menu-entry action="edit.delete"></se-context-menu-entry>
+		</div>
+		<div class="dropdown-menu-group">
+			<se-context-menu-entry action="edit.convertToPath"></se-context-menu-entry>
+			<se-context-menu-entry action="edit.path"></se-context-menu-entry>
+		</div>
+		<div class="dropdown-menu-group">
+			<se-context-menu-entry action="edit.settings"></se-context-menu-entry>
+		</div>
+	</se-context-menu>
+</se-dropdown>
+<se-dropdown [button]="menuSelection">
+	<se-context-menu>
+		<div class="dropdown-menu-group">
+			<se-context-menu-entry action="selection.all"></se-context-menu-entry>
+			<se-context-menu-entry action="selection.clear"></se-context-menu-entry>
+			<se-context-menu-entry action="selection.invert"></se-context-menu-entry>
+		</div>
+	</se-context-menu>
+</se-dropdown>
+<se-dropdown [button]="menuView">
+	<se-context-menu>
+		<div class="dropdown-menu-group">		
+			<se-context-menu-entry action="view.grid.show"></se-context-menu-entry>
+			<se-context-menu-entry action="view.grid.size"></se-context-menu-entry>
+			<se-context-menu-entry action="view.grid.snap"></se-context-menu-entry>
+		</div>
+		<div class="dropdown-menu-group">		
+			<se-context-menu-entry action="view.wireframeMode"></se-context-menu-entry>
+		</div>
+	</se-context-menu>
+</se-dropdown>
+<se-dropdown [button]="menuImage">
+	<se-context-menu>
+		<div class="dropdown-menu-group">		
+			<se-context-menu-entry action="image.adjustSize"></se-context-menu-entry>
+			<se-context-menu-entry action="image.fitToContent"></se-context-menu-entry>
+		</div>
+	</se-context-menu>
+</se-dropdown>
+<se-dropdown [button]="menuHelp">
+	<se-context-menu>
+		<div class="dropdown-menu-group">		
+			<se-context-menu-entry action="help.about"></se-context-menu-entry>
+			<se-context-menu-entry action="help.shortcuts"></se-context-menu-entry>
+		</div>
+	</se-context-menu>
+</se-dropdown>

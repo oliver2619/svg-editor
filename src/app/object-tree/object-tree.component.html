@@ -1,0 +1,15 @@
+<div class="toolbar">
+	<div class="toolbar-group">
+		<button type="button"><img src="/assets/icons/layer_add.png"></button>
+		<button type="button"><img src="/assets/icons/layer_delete.png"></button>
+		<button type="button" title="Duplicate"><img src="/assets/icons/layer_arrange.png"></button>
+		<button type="button"><img src="/assets/icons/arrow_up.png"></button>
+		<button type="button"><img src="/assets/icons/arrow_down.png"></button>
+		<button type="button" title="Combine down"><img src="/assets/icons/layer_import.png"></button>
+	</div>
+</div>
+<div class="tree">
+	<ul>
+		<li *ngFor="let s of topLevelShapes"><img src="/assets/icons/{{getIcon(s)}}"><label>{{s.id}}</label><a><img src="/assets/icons/eye.png"></a></li>
+	</ul>
+</div>

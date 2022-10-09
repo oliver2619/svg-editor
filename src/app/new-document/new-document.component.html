@@ -1,0 +1,32 @@
+<se-dialog title="{{'document.new.title' | text}}" buttons="ok cancel" [ok-enabled]="okEnabled" (ok)="ok()" (cancel)="cancel()">
+	<form [formGroup]="formGroup">
+		<div class="form-group">
+			<label for="title" seText="title" [seAccessKey]="true"></label>
+			<input #focus type="text" id="title" formControlName="title" spellcheck="false">
+		</div>
+		<div class="form-group">
+			<label for="width" seText="width" [seAccessKey]="true"></label>
+			<input type="number" id="width" min="1" formControlName="width" (input)="onSizeChange()">
+		</div>
+		<div class="form-group">
+			<label for="height" seText="height" [seAccessKey]="true"></label>
+			<input type="number" id="height" min="1" formControlName="height" (input)="onSizeChange()">
+		</div>
+		<div class="form-group">
+			<label for="preset" seText="preset" [seAccessKey]="true"></label>
+			<select id="preset" size="11" formControlName="preset" (change)="onPresetChange()">
+				<option value="16x16">16&times;16</option>
+				<option value="24x24">24&times;24</option>
+				<option value="32x32">32&times;32</option>
+				<option value="48x48">48&times;48</option>
+				<option value="64x64">64&times;64</option>
+				<option value="96x96">96&times;96</option>
+				<option value="128x128">128&times;128</option>
+				<option value="192x192">192&times;192</option>
+				<option value="256x256">256&times;256</option>
+				<option value="384x384">384&times;384</option>
+				<option value="512x512">512&times;512</option>
+			</select>
+		</div>
+	</form>
+</se-dialog>

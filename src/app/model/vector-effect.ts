@@ -1,0 +1,1 @@
+export type VectorEffect = 'none' | 'non-scaling-stroke' | 'non-scaling-size' | 'non-rotation' | 'fixed-position';

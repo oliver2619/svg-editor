@@ -1,0 +1,8 @@
+<se-dialog title="{{'view.grid.size' | text}}" buttons="ok cancel" [ok-enabled]="okEnabled" (ok)="ok()" (cancel)="cancel()">
+	<form [formGroup]="formGroup">
+		<div class="form-group">
+			<label for="size" seText="size" [seAccessKey]="true"></label>
+			<input #focus type="number" id="size" min="1" formControlName="size">
+		</div>
+	</form>
+</se-dialog>

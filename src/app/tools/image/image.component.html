@@ -1,0 +1,23 @@
+<form [formGroup]="formGroup">
+	<div class="form-group">
+		<a href="javascript:" (click)="upload()"><se-image-preview [src]="imageUrl"></se-image-preview></a>
+	</div>
+	<div class="form-group">
+		<label seText="filename"></label>
+		<input type="text" formControlName="name">
+	</div>
+	<div class="form-group button-list">
+		<label><input type="checkbox" formControlName="embedded">&nbsp;<span seText="tool.image.embedded"></span></label>
+	</div>
+	<div *ngIf="hasImage" class="form-group">
+		<label>{{'tool.image.size' | text}}:&nbsp;{{width}}&times;{{height}}&nbsp;px</label>
+	</div>
+	<div class="form-group button-list">
+		<label><input type="checkbox" formControlName="preserveAspectRatio">&nbsp;<span seText="tool.image.preserveAspectRatio"></span></label>
+	</div>
+	<div class="form-group">
+		<label seText="opacity"></label>
+		<se-slider-input unit="%" [control]="formGroup.controls['opacity']" [min]="0" [max]="100"></se-slider-input>
+	</div>
+</form>
+<input #fileUpload type="file" (change)="onInput()" accept=".png,.jpg,.jpeg" style="position: absolute; visibility: hidden">

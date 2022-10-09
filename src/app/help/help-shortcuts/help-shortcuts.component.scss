@@ -1,0 +1,42 @@
+@import '../../../shared.scss';
+
+table {
+	border-collapse: collapse;
+}
+
+tr {
+	&:nth-child(n + 2) {
+		
+		td, th {
+			border-top: 1px solid #ccc;
+		}
+	}
+}
+
+th {
+	text-align: start;
+}
+
+td {
+	text-align: end;
+}
+
+td, th {
+	padding: $spacing;
+}
+
+.groups {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+}
+
+.group {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	
+	&:nth-child(n + 2) {
+		margin-left: $spacing * 4;
+	}
+}

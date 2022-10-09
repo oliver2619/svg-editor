@@ -1,0 +1,12 @@
+<se-dialog title="{{'image.adjustSize' | text}}" buttons="ok cancel" [ok-enabled]="okEnabled" (ok)="ok()" (cancel)="cancel()">
+	<form [formGroup]="formGroup">
+		<div class="form-group">
+			<label for="width" seText="width" [seAccessKey]="true"></label>
+			<input #focus type="number" id="width" min="1" formControlName="width">
+		</div>
+		<div class="form-group">
+			<label for="height" seText="height" [seAccessKey]="true"></label>
+			<input type="number" id="height" min="1" formControlName="height">
+		</div>
+	</form>
+</se-dialog>

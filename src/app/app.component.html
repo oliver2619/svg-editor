@@ -1,0 +1,34 @@
+<se-menu></se-menu>
+<se-toolbar></se-toolbar>
+<div class="main-columns">
+	<div class="section-rows form">
+		<div class="section">
+			<se-tools></se-tools>
+		</div>
+	</div>
+	<div class="section-rows grow">
+		<div class="section grow ">
+			<se-view></se-view>
+		</div>
+	</div>
+	<div class="section-rows form" style="min-width: 18%">
+		<div class="section grow">
+			<se-tab-control>
+				<se-tab icon="icons/document_tree.png" title="{{'objectTree.title' | text}}">
+					<se-object-tree></se-object-tree>
+				</se-tab>
+				<se-tab icon="icons/color_swatch.png"></se-tab>
+				<se-tab icon="icons/stamp_pattern.png" title="{{'patterns' | text}}"></se-tab>
+			</se-tab-control>
+		</div>
+		<div class="section">
+			<se-selection-properties></se-selection-properties>
+		</div>
+		<div class="section">
+			<se-miniview></se-miniview>
+		</div>
+	</div>
+</div>
+<div #dialogLayer class="dialog-layer">
+	<router-outlet></router-outlet>
+</div>

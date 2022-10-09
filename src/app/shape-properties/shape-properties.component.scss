@@ -1,0 +1,34 @@
+@import '../../shared.scss';
+
+:host {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+a {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.style-list {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	align-self: stretch;
+	justify-content: center;
+	
+	& > *:nth-child(n + 2) {
+		margin-left: $spacing * 2;
+	}
+}
+
+.hidden {
+	display: none;
+}
+
+svg {
+	background: url('/assets/images/background.png');
+	border: 1px solid black;
+}

@@ -1,0 +1,8 @@
+<se-dialog title="{{'document.importSvg' | text}}" buttons="ok cancel" ok-text="{{'document.importSvg' | text}}" [ok-enabled]="okEnabled" [additional-buttons]="additionalButtons" (ok)="importSvg()" (cancel)="cancel()">
+	<form [formGroup]="formGroup">
+		<div class="form-group">
+			<textarea formControlName="source" rows="20" cols="100" class="code" spellcheck="false"></textarea>
+		</div>
+	</form>
+</se-dialog>
+<input #fileUpload type="file" (change)="onInputSvg()" accept=".svg" style="position: absolute; visibility: hidden">

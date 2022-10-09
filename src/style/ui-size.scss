@@ -1,0 +1,109 @@
+@import '../shared.scss';
+
+.ui-small {
+	
+	body, button, input, textarea, select, label, div {
+		font-size: $font-size * .8;
+	}
+	
+	h1 {
+		font-size: $font-size * 2 * .8;
+	}
+	
+	h2 {
+		font-size: $font-size * 1.4 * 0.8;
+	}
+
+	h3 {
+		font-size: $font-size * 1.2 * 0.8;
+	}
+
+	small {
+		font-size: $font-size-small * 0.8;
+	}
+
+	button > img, img.icon {
+		width: 16px;
+		height: 16px;
+	}
+	
+	img.overlay {
+		transform: translate(16px * .33, 16px * .33)
+	}
+	
+	.image-container {
+		width: 16px;
+	}
+}
+
+.ui-medium {
+	
+	body, button, input, textarea, select, label, div {
+		font-size: $font-size;
+	}
+
+	h1 {
+		font-size: $font-size * 2;
+	}
+
+	h2 {
+		font-size: $font-size * 1.4;
+	}
+
+	h3 {
+		font-size: $font-size * 1.2;
+	}
+	
+	small {
+		font-size: $font-size-small;
+	}
+	
+	button > img, img.icon {
+		width: 24px;
+		height: 24px;
+	}
+	
+	img.overlay {
+		transform: translate(24px * .33, 24px * .33)
+	}
+	
+	.image-container {
+		width: 24px;
+	}
+}
+
+.ui-large {
+	
+	body, button, input, textarea, select, label, div {
+		font-size: $font-size * 1.2;
+	}
+
+	h1 {
+		font-size: $font-size * 2 * 1.2;
+	}
+
+	h2 {
+		font-size: $font-size * 1.4 * 1.2;
+	}
+
+	h3 {
+		font-size: $font-size * 1.2 * 1.2;
+	}
+
+	small {
+		font-size: $font-size-small * 1.2;
+	}
+
+	button > img, img.icon {
+		width: 32px;
+		height: 32px;
+	}
+	
+	img.overlay {
+		transform: translate(32px * .33, 32px * .33)
+	}
+	
+	.image-container {
+		width: 32px;
+	}
+}

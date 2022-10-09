@@ -1,0 +1,12 @@
+<img src="assets/icons/zoom.png">
+<form [formGroup]="formGroup">
+	<select formControlName="zoom" (change)="onChange()">
+		<option *ngIf="isCustom" value="custom">{{currentZoomValue}} %</option>
+		<option *ngIf="isCustom" disabled="disabled">----------</option>
+		<option *ngFor="let z of predefinedZoomValues" value="{{z}}" [ngClass]="{default: z == 1}">{{z * 100}} %</option>
+		<option disabled="disabled">----------</option>
+		<option value="canvas" seText="zoom.canvas" seTitle="zoom.fitToCanvas"></option>
+		<option value="content" seText="zoom.content" seTitle="zoom.fitToContent"></option>
+		<option value="selection" seText="zoom.selection" seTitle="zoom.fitToSelection"></option>
+	</select>
+</form>

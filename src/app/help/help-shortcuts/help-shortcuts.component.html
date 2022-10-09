@@ -1,0 +1,13 @@
+<se-dialog title="{{'help.shortcuts' | text}}" buttons="close" (cancel)="close()">
+	<div class="groups">
+		<div *ngFor="let g of groups" class="group">
+			<h2>{{g.name}}</h2>
+			<table>
+				<tr *ngFor="let e of g.elements">
+					<th>{{e.name}}</th>
+					<td>{{e.shortcut}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</se-dialog>

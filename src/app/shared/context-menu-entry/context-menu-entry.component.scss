@@ -1,0 +1,41 @@
+@import '../../../shared.scss';
+
+:host {
+	cursor: pointer;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	&:hover {
+		background-color: $color-active-background;
+	}
+	
+	&.disabled {
+		opacity: .5;
+		cursor: default;
+		
+		&:hover {
+			background-color: white;
+		}
+	}
+	
+	.action {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		flex-grow: 1;
+		
+		*:nth-child(n + 2) {
+			margin-left: 2em;
+		}
+	}
+	
+	.shortcut {
+		min-width: 2em;
+	}
+	
+	& > * {
+		padding: $context-menu-spacing $context-menu-spacing;
+	}
+}

@@ -1,0 +1,62 @@
+<div class="style-list">
+	<a *ngIf="enableFill" (click)="selectFillColor()" href="javascript:" seTitle="shape.fillColor">
+		<svg xmlns="http://www.w3.org/2000/svg" width="48" height="36">
+			<rect #fillColor x="0" y="0" width="48" height="36" stroke="none"/>
+		</svg>
+	</a>
+	<a (click)="selectStrokeColor()" href="javascript:" seTitle="shape.strokeColor">
+		<svg xmlns="http://www.w3.org/2000/svg" width="48" height="36">
+			<rect #strokeColor x="0" y="0" width="48" height="36" fill="none" stroke-width="8"/>
+		</svg>
+	</a>
+	<a href="javascript:" (click)="selectDashArray()" seTitle="dashPattern">
+		<svg xmlns="http://www.w3.org/2000/svg" width="48" height="36">
+			<line x1="0" y1="36" x2="48" y2="0" stroke="white" stroke-width="4"/>
+			<line #dashArray x1="0" y1="36" x2="48" y2="0" stroke="black" stroke-width="4"/>
+		</svg>
+	</a>
+	<button type="button" seTitle="lineJoin" #linejoin [ngClass]="{hidden: !enableLineJoin}">
+		<img *ngIf="lineJoin === 'arcs'" src="/assets/icons/linejoin_arcs.svg">
+		<img *ngIf="lineJoin === 'bevel'" src="/assets/icons/linejoin_bevel.svg">
+		<img *ngIf="lineJoin === 'round'" src="/assets/icons/linejoin_round.svg">
+	</button>
+	<button type="button" seTitle="lineCap" #linecap [ngClass]="{hidden: !enableLineCap}">
+		<img *ngIf="lineCap === 'butt'" src="/assets/icons/linecap_butt.svg">
+		<img *ngIf="lineCap === 'round'" src="/assets/icons/linecap_round.svg">
+		<img *ngIf="lineCap === 'square'" src="/assets/icons/linecap_square.svg">
+	</button>
+</div>
+<se-dropdown [button]="linejoin" align="left">	
+	<se-context-menu>
+		<se-context-menu-entry [action]="actionJoinBevel"></se-context-menu-entry>
+		<se-context-menu-entry [action]="actionJoinRound"></se-context-menu-entry>
+		<se-context-menu-entry [action]="actionJoinArcs"></se-context-menu-entry>
+	</se-context-menu>
+</se-dropdown>
+<se-dropdown [button]="linecap" align="left">	
+	<se-context-menu>
+		<se-context-menu-entry [action]="actionCapButt"></se-context-menu-entry>
+		<se-context-menu-entry [action]="actionCapRound"></se-context-menu-entry>
+		<se-context-menu-entry [action]="actionCapSquare"></se-context-menu-entry>
+	</se-context-menu>
+</se-dropdown>
+<form [formGroup]="formGroup">
+	<div class="form-group">
+		<label seText="opacity"></label>
+		<se-slider-input unit="%" [control]="formGroup.controls['opacity']" [min]="0" [max]="100"></se-slider-input>
+	</div>
+	<div class="form-group">
+		<label seText="lineWidth"></label>
+		<input type="number" formControlName="strokeWidth" min="0" max="9999">
+	</div>
+	<div class="form-group">
+		<label seText="vectorOptions"></label>
+		<select formControlName="vectorEffect">
+			<option value="none" seText="vectorOptions.none"></option>
+			<option value="non-scaling-stroke" seText="vectorOptions.nonScalingStroke"></option>
+			<option value="non-scaling-size" seText="vectorOptions.nonScalingSize"></option>
+			<option value="non-rotation" seText="vectorOptions.nonRotation"></option>
+			<option value="fixed-position" seText="vectorOptions.fixedPosition"></option>
+		</select>
+	</div>
+</form>

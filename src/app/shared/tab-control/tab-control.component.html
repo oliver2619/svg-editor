@@ -1,0 +1,6 @@
+<div class="tabs">
+	<button *ngFor="let t of tabs; let i = index" type="button" (click)="select(i)" [ngClass]="{active: i == active}" title="{{t.title}}"><img *ngIf="t.icon !== undefined" src="/assets/{{t.icon}}">{{t.name}}</button>
+</div>
+<div class="content">
+	<ng-content></ng-content>
+</div>

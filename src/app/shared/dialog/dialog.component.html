@@ -1,0 +1,21 @@
+<div class="background-pane"></div>
+<div class="dialog-pane">
+	<div class="dialog">
+		<h1>{{title}}</h1>
+		<div>
+			<ng-content></ng-content>
+		</div>
+		<div class="dialog-button-group">
+			<div class="dialog-button-list">
+				<button *ngFor="let b of additionalButtons; let i = index" type="button" (click)="onButton(i)" [ngClass]="{active: b.active !== undefined && b.active()}">{{b.name}}</button>
+			</div>
+			<div class="dialog-button-list">
+				<button *ngIf="okVisible" type="button" (click)="onOk()" [disabled]="okDisabled" seShortcut="code:Enter">{{okText}}</button>
+				<button *ngIf="yesVisible" type="button" (click)="onOk()" [disabled]="okDisabled" seText="dialog.yes" seShortcut="code:Enter"></button>
+				<button *ngIf="noVisible" type="button" (click)="onNo()" seText="dialog.no" seShortcut="key:N" seModifier="ALT"></button>
+				<button *ngIf="cancelVisible" type="button" (click)="onCancel()" seText="dialog.cancel" seShortcut="code:Escape"></button>
+				<button *ngIf="closeVisible" type="button" (click)="onCancel()" seText="dialog.close" seShortcut="code:Escape"></button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,21 @@
+<se-shape-properties [global]="true"></se-shape-properties>
+<form [formGroup]="formGroup">
+	<div class="form-group">
+		<label seText="fontFamily"></label>
+		<input type="text" list="fonts" formControlName="fontFamily">
+		<datalist id="fonts">
+			<option *ngFor="let f of fonts" value="{{f}}">
+		</datalist>
+	</div>
+	<div class="form-group">
+		<label seText="size"></label>
+		<input type="number" formControlName="fontSize" min="1" max="100">
+	</div>
+	<div class="form-group button-list">
+		<button type="button"><b>B</b></button>
+		<button type="button"><i>I</i></button>
+	</div>
+	<div class="form-group">
+		<p [ngStyle]="{'font-family': fontFamily, 'font-size': fontSize}">Abcdefg</p>
+	</div>
+</form>

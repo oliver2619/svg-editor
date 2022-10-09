@@ -1,0 +1,43 @@
+<h2 seText="tools"></h2>
+<div class="floating-tool-bar">
+	<button type="button" seAction="tool.select"></button>
+	<button type="button" seAction="tool.selectRect"></button>
+	<button type="button" seAction="tool.pipette"></button>
+	<button type="button" seAction="tool.measure"></button>
+	<button type="button" seAction="tool.panning"></button>
+	<button type="button" seAction="tool.zoom"></button>
+	<button type="button" seAction="tool.crop"></button>
+</div>
+<div class="floating-tool-bar">
+	<button type="button" seAction="tool.pencil"></button>
+	<button #line type="button"></button>
+	<button type="button" seAction="tool.rect"></button>
+	<button #ellipse type="button"></button>
+	<button #shape type="button"></button>
+	<button type="button" seAction="tool.text"></button>
+	<button type="button" seAction="tool.image"></button>
+	<button type="button" seAction="tool.library"></button>
+</div>
+<div class="floating-tool-bar">
+	<button type="button" seAction="tool.move"></button>
+	<button type="button" seAction="tool.rotate"></button>
+	<button type="button" seAction="tool.scale"></button>
+</div>
+<se-multi-button [button]="line">
+	<se-context-menu>
+		<se-context-menu-entry action="tool.line"></se-context-menu-entry>
+	</se-context-menu>
+</se-multi-button>
+<se-multi-button [button]="ellipse">
+	<se-context-menu>
+		<se-context-menu-entry action="tool.circle"></se-context-menu-entry>
+		<se-context-menu-entry action="tool.ellipse"></se-context-menu-entry>
+	</se-context-menu>
+</se-multi-button>
+<se-multi-button [button]="shape">
+	<se-context-menu>
+		<se-context-menu-entry action="tool.polygon"></se-context-menu-entry>
+		<se-context-menu-entry action="tool.path"></se-context-menu-entry>
+	</se-context-menu>
+</se-multi-button>
+<div #properties></div>

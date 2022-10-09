@@ -1,0 +1,9 @@
+<div class="view-panel">
+	<div #container class="svg-container" (pointerdown)="onSvgPointerDown($event, true)" (pointermove)="onSvgPointerMove($event, true)" (pointerup)="onSvgPointerUp($event, true)" [ngStyle]="{cursor: cursor}"></div>
+	<div *ngIf="needsPane" (pointerdown)="onSvgPointerDown($event, false)" (pointermove)="onSvgPointerMove($event, false)" (pointerup)="onSvgPointerUp($event, false)" class="svg-pane" [ngStyle]="{cursor: cursor}"></div>
+</div>
+<div class="status">
+	<div><span class="coordinate">{{hoverCoordinate.x | number:'1.0-0'}}</span>:<span class="coordinate">{{hoverCoordinate.y | number:'1.0-0'}}</span></div>
+	<se-zoom></se-zoom>
+	<se-tool-help></se-tool-help>
+</div>

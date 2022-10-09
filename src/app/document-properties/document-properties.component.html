@@ -1,0 +1,8 @@
+<se-dialog title="{{'document.properties.title' | text}}" buttons="ok cancel" [ok-enabled]="okEnabled" (ok)="ok()" (cancel)="cancel()">
+	<form [formGroup]="formGroup">
+		<div class="form-group">
+			<label for="title" seText="title" [seAccessKey]="true"></label>
+			<input #focus type="text" id="title" formControlName="title" spellcheck="false">
+		</div>
+	</form>
+</se-dialog>

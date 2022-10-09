@@ -1,0 +1,61 @@
+@import '../../shared.scss';
+
+:host {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+.view-panel {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	flex-grow: 1;
+	flex-shrink: 1;
+	justify-content: stretch;
+}
+
+.svg-container {
+	overflow: scroll;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	flex-grow: 1;
+	flex-shrink: 1;
+	justify-content: flex-start;
+	border: 1px solid black;
+	background-color: #bfbfbf;
+}
+
+.svg-pane {
+	z-index: $z-index-panel;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(white, 0);
+}
+
+.status {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	
+	& > * {
+		margin: $spacing 0;
+		
+		&:nth-child(n + 2) {
+			margin-left: $spacing * 4;
+		}
+	}
+	
+	.coordinate {
+		display: inline-block;
+		min-width: 2.5em;
+		text-align: right;
+	}
+}

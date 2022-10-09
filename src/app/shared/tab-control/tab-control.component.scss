@@ -1,0 +1,48 @@
+@import '../../../shared.scss';
+
+:host {
+	flex-grow: 1;
+	flex-shrink: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
+.tabs {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+
+	button {
+		position: relative;
+		z-index: 1;
+		box-shadow: none;
+		border-radius: $spacing * 2;
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+		transform: translate(0, 2px);
+
+		&.active {
+			z-index: 3;
+			background-color: white;
+			border-bottom: none;
+			transform: translate(0, 1px);
+		}
+	}
+}
+
+.content {
+	poistion: relative;
+	z-index: 2;
+	flex-grow: 1;
+	flex-shrink: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	border: 1px solid black;
+	// border-top: none;
+	border-radius: $spacing;
+	border-top-left-radius: 0;
+	padding: $spacing;
+	background-color: white;
+}
