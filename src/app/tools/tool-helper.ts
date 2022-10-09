@@ -10,7 +10,7 @@ export class TransformToolHelper {
 		const svg = (this.group.element.ownerSVGElement as SVGSVGElement);
 		this.selectionGroup = this.group.group();
 		const el = ids.map(id => svg.getElementById(id) as SVGElement);
-		el.forEach(e => (this.selectionGroup as GroupBuilder).element.appendChild(e));
+		el.forEach(e => (this.selectionGroup as GroupBuilder).element.appendChild(e.cloneNode(false)));
 	}
 
 	end() {
