@@ -10,6 +10,7 @@ import { EllipseProperties, LineProperties, PolylineProperties, PolygonPropertie
 import { ShapeModel, GroupModel } from './shape-model';
 import { PathProperties } from './path-properties';
 import { MultiCommand } from './command/command';
+import { SvgImporter } from './importer/svg-importer';
 
 @Injectable({
 	providedIn: 'root'
@@ -20,7 +21,6 @@ export class ModelService implements MutableSvgModel {
 
 	private _document: SvgModelImp;
 	private _cmdList: CommandList;
-	private _nextId = 0;
 
 	get height(): number { return this._document.height; }
 
@@ -43,14 +43,10 @@ export class ModelService implements MutableSvgModel {
 		}
 	}
 
-	get nextId(): string {
-		const ret = this._nextId.toString(24);
-		++this._nextId;
-		return `_sid:${ret}`;
-	}
+	get nextId(): string { return this._document.nextId; }
 
 	constructor(private readonly settingsService: SettingsService) {
-		this._document = new SvgModelImp(settingsService.newImageSize.x, settingsService.newImageSize.y, '');
+		this._document = new SvgModelImp(settingsService.newImageSize.x, settingsService.newImageSize.y);
 		this._cmdList = new CommandList(this._document, settingsService.undoHistorySize);
 	}
 
@@ -181,10 +177,9 @@ export class ModelService implements MutableSvgModel {
 	hasShape(id: string): boolean { return this._document.hasShape(id); }
 
 	importSvg(svg: string, filename: string) {
-		this._document = new SvgModelImp(10, 10, filename);
+		this._document = SvgImporter.importFromString(svg);
+		this._document.setTitle(filename);
 		this._cmdList = new CommandList(this._document, this.settingsService.undoHistorySize);
-		this._nextId = 0;
-		this._document.importSvg(svg);
 		this.onDocumentChange.next(this);
 	}
 
@@ -196,9 +191,9 @@ export class ModelService implements MutableSvgModel {
 	}
 
 	newDocument(width: number, height: number, title: string): void {
-		this._document = new SvgModelImp(width, height, title);
+		this._document = new SvgModelImp(width, height);
+		this._document.setTitle(title);
 		this._cmdList = new CommandList(this._document, this.settingsService.undoHistorySize);
-		this._nextId = 0;
 		this.onDocumentChange.next(this);
 	}
 

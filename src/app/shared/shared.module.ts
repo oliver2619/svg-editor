@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogComponent } from './dialog/dialog.component';
 import { ContextMenuComponent } from './context-menu/context-menu.component';
@@ -23,6 +23,9 @@ import { PaletteComponent } from './color/palette/palette.component';
 import { CanvasColorPickerDirective } from './color/canvas-color-picker.directive';
 import { ShortcutDirective } from './shortcut/shortcut.directive';
 import { ImagePreviewComponent } from './image-preview/image-preview.component';
+import { ErrorMessageComponent } from './error/error-message/error-message.component';
+import { ErrorStackComponent } from './error/error-stack/error-stack.component';
+import { SvgEditorErrorHandler } from './error/error-handler';
 
 @NgModule({
 	declarations: [
@@ -48,6 +51,8 @@ import { ImagePreviewComponent } from './image-preview/image-preview.component';
 		CanvasColorPickerDirective,
 		ShortcutDirective,
 		ImagePreviewComponent,
+		ErrorMessageComponent,
+		ErrorStackComponent
 	],
 	imports: [
 		CommonModule,
@@ -71,6 +76,8 @@ import { ImagePreviewComponent } from './image-preview/image-preview.component';
 		ColorPatternDialogComponent,
 		ShortcutDirective,
 		ImagePreviewComponent,
-	]
+		ErrorStackComponent
+	],
+	providers: [{ provide: ErrorHandler, useClass: SvgEditorErrorHandler }]
 })
 export class SharedModule { }

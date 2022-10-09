@@ -20,14 +20,22 @@ export class SvgModelImp implements MutableSvgModel {
 	private readonly shapeContainer = new ShapeContainerModelImp();
 	private readonly shapesById = new Map<string, ShapeModelImp>();
 
+	private _nextId = 0;
+	private _title: string = '';
+
+	get nextId(): string {
+		const ret = this._nextId.toString(24);
+		++this._nextId;
+		return `_sid:${ret}`;
+	}
+
 	get height(): number { return this._height; }
 
 	get title(): string { return this._title; }
 
 	get width(): number { return this._width; }
 
-	constructor(private _width: number, private _height: number, private _title: string) {
-	}
+	constructor(private _width: number, private _height: number) { }
 
 	addCircle(id: string, properties: CircleProperties, parent: string | undefined) {
 		const r = new CircleModelImp(id, parent, properties);
@@ -92,6 +100,15 @@ export class SvgModelImp implements MutableSvgModel {
 	addRect(id: string, properties: RectProperties, parent: string | undefined) {
 		const r = new RectModelImp(id, parent, properties);
 		this.addShape(r, parent, undefined);
+	}
+
+	addShape(shape: ShapeModelImp, parent: string | undefined, zIndex: number | undefined) {
+		if (parent === undefined) {
+			this.shapeContainer.addShape(shape, zIndex);
+		} else {
+			this.getParent(parent).addShape(shape, zIndex);
+		}
+		this.shapesById.set(shape.id, shape);
 	}
 
 	canMoveShapeBackward(id: string): boolean {
@@ -177,10 +194,6 @@ export class SvgModelImp implements MutableSvgModel {
 
 	hasShape(id: string): boolean { return this.shapesById.get(id) !== undefined; }
 
-	importSvg(svg: string) {
-
-	}
-
 	isGroup(id: string): boolean { return this.getShapeById(id).type === ShapeModelType.GROUP; }
 
 	moveShapeToGroup(shapeId: string, parentId: string | undefined, zIndex: number | undefined) {
@@ -244,15 +257,6 @@ export class SvgModelImp implements MutableSvgModel {
 
 	translateShape(id: string, dx: number, dy: number) {
 		this.getShapeById(id).translate(dx, dy);
-	}
-
-	private addShape(shape: ShapeModelImp, parent: string | undefined, zIndex: number | undefined) {
-		if (parent === undefined) {
-			this.shapeContainer.addShape(shape, zIndex);
-		} else {
-			this.getParent(parent).addShape(shape, zIndex);
-		}
-		this.shapesById.set(shape.id, shape);
 	}
 
 	private getParent(parentId: string): GroupModelImp {

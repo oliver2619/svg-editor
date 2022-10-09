@@ -63,53 +63,15 @@ export class PencilTool implements Tool {
 	mouseUp(e: ToolMouseEvent): void {
 		this.cleanUp();
 		if (this.path !== undefined && this.propertiesComponent !== undefined && this.propertiesComponent.shapeProperties !== undefined) {
-			const path = true;
-			const quad = false;
 			const points = this.getReducedPoints(this.path, this.propertiesComponent.value.angleLimit * Math.PI / 180, this.propertiesComponent.value.minSegmentSize);
-			if (path) {
-				this.viewService.addPath({
-					...this.propertiesComponent.shapeProperties.shapeProperties,
-					fill: this.propertiesComponent.shapeProperties.fillProperties,
-					lineCap: this.propertiesComponent.shapeProperties.lineCap,
-					lineJoin: this.propertiesComponent.shapeProperties.lineJoin,
-					stroke: this.propertiesComponent.shapeProperties.strokeProperties,
-					commands: points.map((p, i) => {
-						if (i === 0) {
-							const ret: PathCmdMoveProperties = {
-								cmd: 'M',
-								x: p.x,
-								y: p.y
-							};
-							return ret;
-						} else {
-							if (quad) {
-								const ret: PathCmdContinueQuadCurveToProperties = {
-									cmd: 'T',
-									x: p.x,
-									y: p.y
-								};
-								return ret;
-							} else {
-								const ret: PathCmdLineToProperties = {
-									cmd: 'L',
-									x: p.x,
-									y: p.y
-								};
-								return ret;
-							}
-						}
-					})
-				});
-			} else {
-				this.viewService.addPolyline({
-					...this.propertiesComponent.shapeProperties.shapeProperties,
-					fill: this.propertiesComponent.shapeProperties.fillProperties,
-					lineCap: this.propertiesComponent.shapeProperties.lineCap,
-					lineJoin: this.propertiesComponent.shapeProperties.lineJoin,
-					stroke: this.propertiesComponent.shapeProperties.strokeProperties,
-					points: points
-				});
-			}
+			this.viewService.addPolyline({
+				...this.propertiesComponent.shapeProperties.shapeProperties,
+				fill: this.propertiesComponent.shapeProperties.fillProperties,
+				lineCap: this.propertiesComponent.shapeProperties.lineCap,
+				lineJoin: this.propertiesComponent.shapeProperties.lineJoin,
+				stroke: this.propertiesComponent.shapeProperties.strokeProperties,
+				points: points
+			});
 		}
 		this.path = undefined;
 	}

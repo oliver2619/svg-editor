@@ -40,6 +40,13 @@ export class SingleColor implements Color {
 		}
 	}
 
+	static fromHexString(s: string): SingleColor {
+		const r = Number.parseInt(s.substring(0, 2), 16) / 255;
+		const g = Number.parseInt(s.substring(2, 4), 16) / 255;
+		const b = Number.parseInt(s.substring(4, 6), 16) / 255;
+		return new SingleColor(r, g, b, 1);
+	}
+
 	static fromJson(json: SingleColorJson): SingleColor {
 		if (json.color[0] === '#') {
 			const r = Number.parseInt(json.color.substring(1, 3), 16) / 255;

@@ -1,0 +1,28 @@
+@import '../../../../shared.scss';
+
+@keyframes showError{
+	from {
+		opacity: 0;
+		transform: translate(0, 100%) scale(1,0);
+	}
+	
+	to {
+		opacity: 1;
+		transform: translate(0, 0%) scale(1,1);
+	}
+}
+
+:host {
+	position: relative;
+	pointer-events: all;
+	border: 1px solid #ff0000;
+	border-radius: $spacing;
+	box-shadow: 0 $spacing $spacing $dialog-shadow-color;
+	padding: $spacing * 2;
+	color: #c00000;
+	background-color: #fff0e0;
+	animation-name: showError;
+	animation-duration: 500ms;
+	animation-timing-function: ease-in-out;
+	animation-fill-mode: both;
+}

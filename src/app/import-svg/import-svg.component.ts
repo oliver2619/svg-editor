@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TextService } from '../shared/text/text.service';
 import { Router } from '@angular/router';
 import { DialogAction } from '../shared/dialog/dialog.component';
+import { ErrorService } from '../shared/error/error.service';
 
 interface ImportSvgComponentValue {
 	source: string;
@@ -33,7 +34,7 @@ export class ImportSvgComponent {
 		return this.formGroup.value;
 	}
 
-	constructor(private readonly router: Router, private readonly modelService: ModelService, private readonly textService: TextService, private readonly changeDetectorRef: ChangeDetectorRef, formBuilder: FormBuilder) {
+	constructor(private readonly router: Router, private readonly modelService: ModelService, private readonly textService: TextService, private readonly changeDetectorRef: ChangeDetectorRef, private readonly errorService: ErrorService, formBuilder: FormBuilder) {
 		this.formGroup = formBuilder.group({});
 		this.formGroup.addControl('filename', formBuilder.control(''));
 		this.formGroup.addControl('source', formBuilder.control('', Validators.required));
@@ -45,7 +46,12 @@ export class ImportSvgComponent {
 
 	importSvg(): void {
 		const value = this.value;
-		this.modelService.importSvg(value.source, value.filename);
+		try {
+			this.modelService.importSvg(value.source, value.filename);
+		} catch (e) {
+			this.errorService.showError(`${this.textService.get('document.importSvg.error')}: ${(e as Error).message}`);
+			return;
+		}
 		this.router.navigateByUrl('/');
 	}
 
