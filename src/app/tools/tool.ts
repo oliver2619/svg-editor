@@ -46,18 +46,18 @@ export abstract class AbstractMoveTool implements Tool {
 	}
 
 	mouseMove(e: ToolMouseEvent): void {
-		this.onMove(e.x - this.x, e.y - this.y);
+		this.onMove(e.x - this.x, e.y - this.y, e.shiftKey);
 	}
 
 	mouseUp(e: ToolMouseEvent): void {
-		this.onMouseUp(e.x - this.x, e.y - this.y);
+		this.onMouseUp(e.x - this.x, e.y - this.y, e.shiftKey);
 	}
 
 	protected abstract onMouseDown(e: ToolMouseEvent): void;
 
-	protected abstract onMove(dx: number, dy: number): void;
+	protected abstract onMove(dx: number, dy: number, snapToDiscreteValues: boolean): void;
 
-	protected abstract onMouseUp(dx: number, dy: number): void;
+	protected abstract onMouseUp(dx: number, dy: number, snapToDiscreteValues: boolean): void;
 }
 
 export abstract class AbstractRectSelectTool implements Tool {

@@ -30,14 +30,48 @@ export class MoveTool extends AbstractMoveTool {
 		this.toolHelper.beginTransform(this.viewService.selectedIds);
 	}
 
-	protected onMove(dx: number, dy: number): void {
-		this.viewService.setEditModeCurrentTranslation(dx, dy);
+	protected onMove(dx: number, dy: number, snapToDiscreteValues: boolean): void {
+		if (snapToDiscreteValues) {
+			const r = this.getDiscreteValue(dx, dy);
+			this.viewService.setEditModeCurrentTranslation(r.x, r.y);
+		} else if (this.viewService.snapToGrid) {
+			const r = this.getSnappedValue(dx, dy);
+			this.viewService.setEditModeCurrentTranslation(r.x, r.y);
+		} else {
+			this.viewService.setEditModeCurrentTranslation(dx, dy);
+		}
 	}
 
-	protected onMouseUp(dx: number, dy: number): void {
+	protected onMouseUp(dx: number, dy: number, snapToDiscreteValues: boolean): void {
 		this.viewService.setEditModeCurrentTranslation(0, 0);
 		this.toolHelper.end();
-		this.viewService.translateSelected(dx, dy);
+		if (snapToDiscreteValues) {
+			const r = this.getDiscreteValue(dx, dy);
+			this.viewService.translateSelected(r.x, r.y);
+		} else if (this.viewService.snapToGrid) {
+			const r = this.getSnappedValue(dx, dy);
+			this.viewService.translateSelected(r.x, r.y);
+		} else {
+			this.viewService.translateSelected(dx, dy);
+		}
+	}
+
+	private getDiscreteValue(dx: number, dy: number): { x: number, y: number } {
+		const d = Math.sqrt(dx * dx + dy * dy);
+		let angle = (Math.atan2(dy, dx) + Math.PI * 2) * 180 / Math.PI;
+		angle = Math.round(angle / 15) * 15 * Math.PI / 180;
+		return {
+			x: d * Math.cos(angle),
+			y: d * Math.sin(angle)
+		};
+	}
+
+	private getSnappedValue(dx: number, dy: number): { x: number, y: number } {
+		const gs = this.viewService.gridSize;
+		return {
+			x: Math.round(dx / gs) * gs,
+			y: Math.round(dy / gs) * gs
+		};
 	}
 }
 

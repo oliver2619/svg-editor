@@ -23,10 +23,10 @@ export class ScaleTool extends AbstractMoveTool {
 	protected onMouseDown(e: ToolMouseEvent): void {
 	}
 
-	protected onMove(dx: number, dy: number): void {
+	protected onMove(dx: number, dy: number, snapToDiscreteValues: boolean): void {
 	}
 
-	protected onMouseUp(dx: number, dy: number): void {
+	protected onMouseUp(dx: number, dy: number, snapToDiscreteValues: boolean): void {
 	}
 }
 
