@@ -3,13 +3,13 @@ import { Coordinate } from '../model/coordinate';
 
 export interface View {
 
-	readonly areGroupsSelected: boolean;
 	readonly areOnlyShapesFromOneGroupSelected: boolean;
 	readonly canMoveSelectionBackward: boolean;
 	readonly canMoveSelectionForward: boolean;
 	readonly gridSize: number;
 	readonly gridVisible: boolean;
 	readonly isAnyShapeSelected: boolean;
+	readonly isSingleGroupSelected: boolean;
 	readonly isSingleShapeSelected: boolean;
 	readonly scrollPosition: Coordinate;
 	readonly selectedIds: ReadonlyArray<string>;

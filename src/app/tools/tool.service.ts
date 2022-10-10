@@ -24,6 +24,7 @@ import { PipetteTool } from './pipette-tool';
 import { ZoomTool } from './zoom-tool';
 import { CircleTool } from './circle-tool';
 import { SelectRectTool } from './select-rect-tool';
+import { EditGeometryTool } from './edit-geometry/edit-geometry.component';
 
 export interface Tools {
 
@@ -41,6 +42,7 @@ export class ToolService implements Tools {
 		circle: new CircleTool(this.viewService),
 		crop: new CropTool(this.viewService),
 		ellipse: new EllipseTool(this.viewService),
+		geometry: new EditGeometryTool(),
 		image: new ImageTool(this.viewService),
 		library: new LibraryTool(this.viewService),
 		line: new LineTool(this.viewService),

@@ -1,16 +1,17 @@
 import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { SettingsService } from '../settings/settings.service';
-import { ChangeDocPropertiesCommand, SetSizeCommand, AddRectCommand, AddEllipseCommand, AddLineCommand, AddPolygonCommand, AddPolylineCommand, AddPathCommand, MoveShapeZIndexCommand, AddCircleCommand, AddImageCommand, TranslateShapeCommand, AddGroupCommand, MoveShapeToGroupCommand } from './command/commands';
+import { ChangeDocPropertiesCommand, SetSizeCommand, AddRectCommand, AddEllipseCommand, AddLineCommand, AddPolygonCommand, AddPolylineCommand, AddPathCommand, MoveShapeZIndexCommand, AddCircleCommand, AddImageCommand, TranslateShapeCommand, AddGroupCommand, MoveShapeToGroupCommand, Commands } from './command/commands';
 import { MutableSvgModel, SvgModel } from './svg-model';
 import { CommandList } from './command/command-list';
 import { SvgModelImp } from './model-imp/model-imp';
 import { SvgBuilder } from './svg-builder/svg-builder';
 import { EllipseProperties, LineProperties, PolylineProperties, PolygonProperties, RectProperties, PatternProperties, GroupProperties, CircleProperties, ImageProperties } from './model-element-properties';
-import { ShapeModel, GroupModel } from './shape-model';
+import { ShapeModel, GroupModel, ShapeModelType } from './shape-model';
 import { PathProperties } from './path-properties';
 import { MultiCommand } from './command/command';
 import { SvgImporter } from './importer/svg-importer';
+import { SvgModelImportBuilder } from './importer/svg-model-import-builder';
 
 @Injectable({
 	providedIn: 'root'
@@ -50,43 +51,43 @@ export class ModelService implements MutableSvgModel {
 		this._cmdList = new CommandList(this._document, settingsService.undoHistorySize);
 	}
 
-	addCircle(id: string, properties: CircleProperties, parent: string | undefined) {
-		this._cmdList.run(new AddCircleCommand(id, properties, parent));
+	addCircle(id: string, properties: CircleProperties, parent: string | undefined, zIndex: number | undefined) {
+		this._cmdList.run(new AddCircleCommand(id, properties, parent, zIndex));
 		this.onDocumentChange.next(this);
 	}
 
-	addEllipse(id: string, properties: EllipseProperties, parent: string | undefined) {
-		this._cmdList.run(new AddEllipseCommand(id, properties, parent));
+	addEllipse(id: string, properties: EllipseProperties, parent: string | undefined, zIndex: number | undefined) {
+		this._cmdList.run(new AddEllipseCommand(id, properties, parent, zIndex));
 		this.onDocumentChange.next(this);
 	}
 
-	addImage(id: string, properties: ImageProperties, parent: string | undefined) {
-		this._cmdList.run(new AddImageCommand(id, properties, parent));
+	addImage(id: string, properties: ImageProperties, parent: string | undefined, zIndex: number | undefined) {
+		this._cmdList.run(new AddImageCommand(id, properties, parent, zIndex));
 		this.onDocumentChange.next(this);
 	}
 
-	addLine(id: string, properties: LineProperties, parent: string | undefined) {
-		this._cmdList.run(new AddLineCommand(id, properties, parent));
+	addLine(id: string, properties: LineProperties, parent: string | undefined, zIndex: number | undefined) {
+		this._cmdList.run(new AddLineCommand(id, properties, parent, zIndex));
 		this.onDocumentChange.next(this);
 	}
 
-	addPath(id: string, properties: PathProperties, parent: string | undefined) {
-		this._cmdList.run(new AddPathCommand(id, properties, parent));
+	addPath(id: string, properties: PathProperties, parent: string | undefined, zIndex: number | undefined) {
+		this._cmdList.run(new AddPathCommand(id, properties, parent, zIndex));
 		this.onDocumentChange.next(this);
 	}
 
-	addPolyline(id: string, properties: PolylineProperties, parent: string | undefined) {
-		this._cmdList.run(new AddPolylineCommand(id, properties, parent));
+	addPolyline(id: string, properties: PolylineProperties, parent: string | undefined, zIndex: number | undefined) {
+		this._cmdList.run(new AddPolylineCommand(id, properties, parent, zIndex));
 		this.onDocumentChange.next(this);
 	}
 
-	addPolygon(id: string, properties: PolygonProperties, parent: string | undefined) {
-		this._cmdList.run(new AddPolygonCommand(id, properties, parent));
+	addPolygon(id: string, properties: PolygonProperties, parent: string | undefined, zIndex: number | undefined) {
+		this._cmdList.run(new AddPolygonCommand(id, properties, parent, zIndex));
 		this.onDocumentChange.next(this);
 	}
 
-	addRect(id: string, properties: RectProperties, parent: string | undefined) {
-		this._cmdList.run(new AddRectCommand(id, properties, parent));
+	addRect(id: string, properties: RectProperties, parent: string | undefined, zIndex: number | undefined) {
+		this._cmdList.run(new AddRectCommand(id, properties, parent, zIndex));
 		this.onDocumentChange.next(this);
 	}
 
@@ -136,9 +137,15 @@ export class ModelService implements MutableSvgModel {
 
 	exportSvg(): string { return this._document.exportSvg(); }
 
+	getGroups(id: string): string[] { return this._document.getGroups(id); }
+
+	getShapeById(id: string): ShapeModel { return this._document.getShapeById(id); }
+
 	getShapeMaxZIndex(id: string): number { return this._document.getShapeMaxZIndex(id); }
 
 	getShapeMnemento(id: string): any { return this._document.getShapeMnemento(id); }
+
+	getShapeNestingDepth(id: string): number { return this._document.getShapeNestingDepth(id); }
 
 	getShapeParent(id: string): GroupModel | undefined { return this._document.getShapeParent(id); }
 
@@ -177,7 +184,9 @@ export class ModelService implements MutableSvgModel {
 	hasShape(id: string): boolean { return this._document.hasShape(id); }
 
 	importSvg(svg: string, filename: string) {
-		this._document = SvgImporter.importFromString(svg);
+		const builder = new SvgModelImportBuilder();
+		SvgImporter.importFromString(svg, builder);
+		this._document = builder.getModel();
 		this._document.setTitle(filename);
 		this._cmdList = new CommandList(this._document, this.settingsService.undoHistorySize);
 		this.onDocumentChange.next(this);
@@ -204,7 +213,22 @@ export class ModelService implements MutableSvgModel {
 
 	removeAllShapes(ids: string[]) {
 		if (ids.length > 0) {
-
+			const shapeCommands = Array.from(new Set<string>(ids.flatMap(id => this.getTransformableShapes(id))))
+				.map(id => {
+					const ret: { id: string, z: number } = { id, z: this.getShapeZIndex(id) };
+					return ret;
+				})
+				.sort((s1, s2) => s2.z - s1.z)
+				.map(s => Commands.removeShape(s.id, this));
+			const groupCommands = Array.from(new Set<string>(ids.flatMap(id => this.getGroups(id))))
+				.map(id => {
+					const ret: { id: string, z: number, d: number } = { id, z: this.getShapeZIndex(id), d: this.getShapeNestingDepth(id) };
+					return ret;
+				})
+				.sort((g1, g2) => g1.d !== g2.d ? g2.d - g1.d : (g2.z - g1.z))
+				.map(g => Commands.removeEmptyGroup(g.id, this));
+			this._cmdList.run(new MultiCommand([...shapeCommands, ...groupCommands]));
+			this.onDocumentChange.next(this);
 		}
 	}
 
@@ -230,8 +254,8 @@ export class ModelService implements MutableSvgModel {
 
 	translateAll(shapeIds: string[], dx: number, dy: number) {
 		if (shapeIds.length > 0 && (dx !== 0 || dy !== 0)) {
-			const s = shapeIds.flatMap(id => this.getTransformableShapes(id));
-			const cmds = s.map(id => new TranslateShapeCommand(id, dx, dy));
+			const shapes = Array.from(new Set<string>(shapeIds.flatMap(id => this.getTransformableShapes(id))));
+			const cmds = shapes.map(id => new TranslateShapeCommand(id, dx, dy));
 			this._cmdList.run(new MultiCommand(cmds));
 			this.onDocumentChange.next(this);
 		}
@@ -247,10 +271,19 @@ export class ModelService implements MutableSvgModel {
 		this.onDocumentChange.next(this);
 	}
 
-	ungroupElements(groupIds: string[]) {
-		// for each group:
-		// zIndex
-		// move to zIndex, but be aware, it can change!
-		// remove group
+	ungroupElements(groupId: string) {
+		const zIndex = this._document.getShapeZIndex(groupId);
+		const group = this._document.getShapeById(groupId);
+		if (group.type !== ShapeModelType.GROUP) {
+			throw new RangeError(`Shape ${groupId} is not a group`);
+		}
+		const parentId = group.parentId;
+		const cmd = new MultiCommand();
+		(group as unknown as GroupModel).getTopLevelShapes().map(it => it.id).forEach((c, i) => {
+			cmd.add(new MoveShapeToGroupCommand(c, parentId, zIndex + i));
+		});
+		cmd.add(Commands.removeEmptyGroup(groupId, this._document));
+		this._cmdList.run(cmd);
+		this.onDocumentChange.next(this);
 	}
 }

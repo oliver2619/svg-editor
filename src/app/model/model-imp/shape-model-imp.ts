@@ -22,6 +22,8 @@ export abstract class ShapeModelImp implements ShapeModel {
 
 	abstract buildSvg(builder: ShapeContainerBuilder): void;
 
+	getGroups(): string[] { return []; }
+
 	getMnemento(): ShapeProperties {
 		return {
 			opacity: this._opacity,
@@ -29,15 +31,13 @@ export abstract class ShapeModelImp implements ShapeModel {
 		};
 	}
 
-	getTransformableShapes(): string[] {
-		return [this.id];
-	}
+	getTransformableShapes(): string[] { return [this.id]; }
 
 	setMnemento(m: ShapeProperties) {
 		this._opacity = m.opacity;
 		this._vectorEffect = m.vectorEffect;
 	}
-	
+
 	abstract translate(dx: number, dy: number): void;
 
 	protected buildShapeAttributes(builder: ShapeBuilder<SVGElement>) {

@@ -38,6 +38,7 @@ import { RectComponent } from './tools/rect/rect.component';
 import { ToolHelpComponent } from './view/tool-help/tool-help.component';
 import { HelpAboutComponent } from './help/help-about/help-about.component';
 import { HelpShortcutsComponent } from './help/help-shortcuts/help-shortcuts.component';
+import { EditGeometryComponent } from './tools/edit-geometry/edit-geometry.component';
 
 @NgModule({
 	declarations: [
@@ -74,7 +75,8 @@ import { HelpShortcutsComponent } from './help/help-shortcuts/help-shortcuts.com
 		RectComponent,
 		ToolHelpComponent,
 		HelpAboutComponent,
-		HelpShortcutsComponent
+		HelpShortcutsComponent,
+  EditGeometryComponent
 	],
 	imports: [
 		BrowserModule,

@@ -52,6 +52,8 @@ export class GroupModelImp extends ShapeModelImp implements GroupModel {
 
 	canMoveShapeForward(id: string): boolean { return this.container.canMoveShapeForward(id); }
 
+	override getGroups(): string[] { return [this.id, ...this.container.getTopLevelShapes().flatMap(s => s.getGroups())]; }
+
 	override getMnemento(): GroupProperties {
 		return {
 			...super.getMnemento(),
@@ -60,14 +62,6 @@ export class GroupModelImp extends ShapeModelImp implements GroupModel {
 			lineCap: this.lineCap,
 			lineJoin: this.lineJoin
 		};
-	}
-
-	override setMnemento(m: GroupProperties) {
-		super.setMnemento(m);
-		this.fill = m.fill !== undefined ? new FillModelImp(m.fill) : undefined;
-		this.stroke = m.stroke !== undefined ? new StrokeModelImp(m.stroke) : undefined;
-		this.lineCap = m.lineCap;
-		this.lineJoin = m.lineJoin;
 	}
 
 	getShapeMaxZIndex(id: string): number { return this.container.getShapeMaxZIndex(id); }
@@ -81,6 +75,14 @@ export class GroupModelImp extends ShapeModelImp implements GroupModel {
 	}
 
 	removeShape(id: string) { this.container.removeShape(id); }
+
+	override setMnemento(m: GroupProperties) {
+		super.setMnemento(m);
+		this.fill = m.fill !== undefined ? new FillModelImp(m.fill) : undefined;
+		this.stroke = m.stroke !== undefined ? new StrokeModelImp(m.stroke) : undefined;
+		this.lineCap = m.lineCap;
+		this.lineJoin = m.lineJoin;
+	}
 
 	setShapeZIndex(id: string, zIndex: number) { this.container.setShapeZIndex(id, zIndex); }
 

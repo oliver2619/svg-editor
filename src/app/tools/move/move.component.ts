@@ -23,7 +23,7 @@ export class MoveTool extends AbstractMoveTool {
 	}
 
 	getHint(textService: TextService): string {
-		return '';
+		return textService.get('tool.move.hint');
 	}
 
 	protected onMouseDown(e: ToolMouseEvent): void {

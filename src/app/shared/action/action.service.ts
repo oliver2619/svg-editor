@@ -96,13 +96,6 @@ export class ActionService {
 			shortcutKey: 'key:G',
 			shortcutModifiers: Shortcut.CTRL
 		}),
-		'edit.path': new ViewAction(this.viewService, {
-			action: view => { },
-			enabled: view => false,
-			group: this.textService.get('edit'),
-			name: this.textService.get('edit.path'),
-			icon: 'icons/draw_path.png'
-		}),
 		'edit.redo': new ModelAction(this.modelService, {
 			action: model => model.redo(),
 			enabled: model => model.canRedo,
@@ -129,7 +122,7 @@ export class ActionService {
 		}),
 		'edit.ungroup': new ViewAction(this.viewService, {
 			action: view => this.viewService.ungroupSelected(),
-			enabled: view => view.areGroupsSelected,
+			enabled: view => view.isSingleGroupSelected,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.ungroup'),
 			icon: 'icons/shape_ungroup.png',
@@ -239,6 +232,12 @@ export class ActionService {
 			icon: 'icons/draw_ellipse.png',
 			shortcutKey: 'key:E',
 			shortcutModifiers: Shortcut.SHIFT
+		}),
+		'tool.geometry': new ToolAction(this.toolService, {
+			tool: this.toolService.get('geometry'),
+			group: this.textService.get('tools'),
+			name: this.textService.get('tool.geometry'),
+			icon: 'icons/draw_path.png'
 		}),
 		'tool.image': new ToolAction(this.toolService, {
 			tool: this.toolService.get('image'),

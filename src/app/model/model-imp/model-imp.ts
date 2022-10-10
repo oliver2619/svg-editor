@@ -37,18 +37,18 @@ export class SvgModelImp implements MutableSvgModel {
 
 	constructor(private _width: number, private _height: number) { }
 
-	addCircle(id: string, properties: CircleProperties, parent: string | undefined) {
+	addCircle(id: string, properties: CircleProperties, parent: string | undefined, zIndex: number | undefined) {
 		const r = new CircleModelImp(id, parent, properties);
-		this.addShape(r, parent, undefined);
+		this.addShape(r, parent, zIndex);
 	}
 
 	addCircularGradient() {
 		throw new Error("Method not implemented.");
 	}
 
-	addEllipse(id: string, properties: EllipseProperties, parent: string | undefined) {
+	addEllipse(id: string, properties: EllipseProperties, parent: string | undefined, zIndex: number | undefined) {
 		const r = new EllipseModelImp(id, parent, properties);
-		this.addShape(r, parent, undefined);
+		this.addShape(r, parent, zIndex);
 	}
 
 	addFilter() {
@@ -60,14 +60,14 @@ export class SvgModelImp implements MutableSvgModel {
 		this.addShape(g, parent, zIndex);
 	}
 
-	addImage(id: string, properties: ImageProperties, parent: string | undefined) {
+	addImage(id: string, properties: ImageProperties, parent: string | undefined, zIndex: number | undefined) {
 		const i = new ImageModelImp(id, parent, properties);
-		this.addShape(i, parent, undefined);
+		this.addShape(i, parent, zIndex);
 	}
 
-	addLine(id: string, properties: LineProperties, parent: string | undefined) {
+	addLine(id: string, properties: LineProperties, parent: string | undefined, zIndex: number | undefined) {
 		const l = new LineModelImp(id, parent, properties);
-		this.addShape(l, parent, undefined);
+		this.addShape(l, parent, zIndex);
 	}
 
 	addLinearGradient() {
@@ -78,28 +78,28 @@ export class SvgModelImp implements MutableSvgModel {
 		throw new Error("Method not implemented.");
 	}
 
-	addPath(id: string, properties: PathProperties, parent: string | undefined) {
+	addPath(id: string, properties: PathProperties, parent: string | undefined, zIndex: number | undefined) {
 		const p = new PathModelImp(id, parent, properties);
-		this.addShape(p, parent, undefined);
+		this.addShape(p, parent, zIndex);
 	}
 
 	addPattern(id: string, properties: PatternProperties) {
 		throw new Error("Method not implemented.");
 	}
 
-	addPolyline(id: string, properties: PolylineProperties, parent: string | undefined) {
+	addPolyline(id: string, properties: PolylineProperties, parent: string | undefined, zIndex: number | undefined) {
 		const p = new PolylineModelImp(id, parent, properties);
-		this.addShape(p, parent, undefined);
+		this.addShape(p, parent, zIndex);
 	}
 
-	addPolygon(id: string, properties: PolygonProperties, parent: string | undefined) {
+	addPolygon(id: string, properties: PolygonProperties, parent: string | undefined, zIndex: number | undefined) {
 		const p = new PolygonModelImp(id, parent, properties);
-		this.addShape(p, parent, undefined);
+		this.addShape(p, parent, zIndex);
 	}
 
-	addRect(id: string, properties: RectProperties, parent: string | undefined) {
+	addRect(id: string, properties: RectProperties, parent: string | undefined, zIndex: number | undefined) {
 		const r = new RectModelImp(id, parent, properties);
-		this.addShape(r, parent, undefined);
+		this.addShape(r, parent, zIndex);
 	}
 
 	addShape(shape: ShapeModelImp, parent: string | undefined, zIndex: number | undefined) {
@@ -144,6 +144,18 @@ export class SvgModelImp implements MutableSvgModel {
 		return outer.innerHTML;
 	}
 
+	getGroups(id: string): string[] {
+		return this.getShapeById(id).getGroups();
+	}
+
+	getShapeById(id: string): ShapeModelImp {
+		const shape = this.shapesById.get(id);
+		if (shape === undefined) {
+			throw new RangeError(`Shape ${id} not found`);
+		}
+		return shape;
+	}
+
 	getShapeMaxZIndex(id: string): number {
 		const parent = this.getShapeParent(id);
 		if (parent !== undefined) {
@@ -151,6 +163,11 @@ export class SvgModelImp implements MutableSvgModel {
 		} else {
 			return this.shapeContainer.getShapeMaxZIndex(id);
 		}
+	}
+
+	getShapeNestingDepth(id: string): number {
+		const parent = this.getShapeParent(id);
+		return parent !== undefined ? this.getShapeNestingDepth(parent.id) + 1 : 0;
 	}
 
 	getShapeMnemento(id: string): any { return this.getShapeById(id).getMnemento(); }
@@ -265,13 +282,5 @@ export class SvgModelImp implements MutableSvgModel {
 			throw new RangeError(`Parent shape ${parentId} not found or is no group`);
 		}
 		return parent;
-	}
-
-	private getShapeById(id: string): ShapeModelImp {
-		const shape = this.shapesById.get(id);
-		if (shape === undefined) {
-			throw new RangeError(`Shape ${id} not found`);
-		}
-		return shape;
 	}
 }

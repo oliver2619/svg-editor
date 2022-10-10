@@ -1,24 +1,26 @@
-## next (2)
-* selection ungroup: implement, select all ungrouped elements
-* layer view: nested groups
-
-## todo (23)
-* delete selected
-* image
-	* rescale
-	* fit to content
+## todo (27)
+* import: title
 * linear gradient
 * radial gradient
 * pattern
 * svg import: color references url(...)
+* image
+	* rescale
+	* fit to content
 * flip horiz / vert
 * convert to path
 * convert to polygon
 * convert to polyline
 * edit path
-* edit polygon
-* edit polyline
+	* ellipse
+	* circle
+	* rect
+	* polygon
+	* polyline
+	* line
+	* path
 * paint preview: use selected shape properties (pencil, line, rect, circle, ellipse, polygon, path)
+* layer view: nested groups
 * show grid
 * wireframe mode
 * duplicate selection
@@ -80,7 +82,7 @@
 * auswahl invertieren (why and how?)
 
 # Bugs (2)
-* undo insert shape when shape is selected causes error
+* undo insert shape / redo remove group: when shape is selected causes error
 * has been checked error in tools component
 
 # Improvements

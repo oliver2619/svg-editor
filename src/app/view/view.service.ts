@@ -10,6 +10,7 @@ import { EllipseProperties, LineProperties, RectProperties, PolylineProperties, 
 import { SelectionHandle } from './selection-handle';
 import { Coordinate } from '../model/coordinate';
 import { PathProperties } from '../model/path-properties';
+import { GroupModel } from '../model/shape-model';
 
 export enum ViewSelectMode {
 	REPLACE, ADD, REMOVE
@@ -47,13 +48,6 @@ export class ViewService implements View {
 	private _gridVisible = true;
 	private _rulerVisible = true;
 	private _wireframe = false;
-
-	get areGroupsSelected(): boolean {
-		if (this._selectedIds.length === 0) {
-			return false;
-		}
-		return this._selectedIds.every(id => this.modelService.isGroup(id));
-	}
 
 	get areOnlyShapesFromOneGroupSelected(): boolean {
 		if (this._selectedIds.length === 0) {
@@ -101,6 +95,13 @@ export class ViewService implements View {
 
 	get isAnyShapeSelected(): boolean {
 		return this._selectedIds.length > 0;
+	}
+
+	get isSingleGroupSelected(): boolean {
+		if (this._selectedIds.length !== 1) {
+			return false;
+		}
+		return this._selectedIds.every(id => this.modelService.isGroup(id));
 	}
 
 	get isSingleShapeSelected(): boolean {
@@ -166,35 +167,35 @@ export class ViewService implements View {
 	}
 
 	addCircle(properties: CircleProperties) {
-		this.modelService.addCircle(this.modelService.nextId, properties, undefined);
+		this.modelService.addCircle(this.modelService.nextId, properties, undefined, undefined);
 	}
 
 	addEllipse(properties: EllipseProperties) {
-		this.modelService.addEllipse(this.modelService.nextId, properties, undefined);
+		this.modelService.addEllipse(this.modelService.nextId, properties, undefined, undefined);
 	}
 
 	addImage(properties: ImageProperties) {
-		this.modelService.addImage(this.modelService.nextId, properties, undefined);
+		this.modelService.addImage(this.modelService.nextId, properties, undefined, undefined);
 	}
 
 	addLine(properties: LineProperties) {
-		this.modelService.addLine(this.modelService.nextId, properties, undefined);
+		this.modelService.addLine(this.modelService.nextId, properties, undefined, undefined);
 	}
 
 	addRect(properties: RectProperties) {
-		this.modelService.addRect(this.modelService.nextId, properties, undefined);
+		this.modelService.addRect(this.modelService.nextId, properties, undefined, undefined);
 	}
 
 	addPath(properties: PathProperties) {
-		this.modelService.addPath(this.modelService.nextId, properties, undefined);
+		this.modelService.addPath(this.modelService.nextId, properties, undefined, undefined);
 	}
 
 	addPolyline(properties: PolylineProperties) {
-		this.modelService.addPolyline(this.modelService.nextId, properties, undefined);
+		this.modelService.addPolyline(this.modelService.nextId, properties, undefined, undefined);
 	}
 
 	addPolygon(properties: PolygonProperties) {
-		this.modelService.addPolygon(this.modelService.nextId, properties, undefined);
+		this.modelService.addPolygon(this.modelService.nextId, properties, undefined, undefined);
 	}
 
 	clearSelection() {
@@ -355,9 +356,12 @@ export class ViewService implements View {
 	}
 
 	ungroupSelected() {
-		const sel = [...this._selectedIds];
-		this._selectedIds = [];
-		this.modelService.ungroupElements(sel);
+		if (this._selectedIds.length === 1) {
+			const groupId = this._selectedIds[0];
+			const group = this.modelService.getShapeById(groupId);
+			this._selectedIds = (group as any as GroupModel).getTopLevelShapes().map(it => it.id);
+			this.modelService.ungroupElements(groupId);
+		}
 	}
 
 	zoomToFitRectangle(x: number, y: number, width: number, height: number, zoomIn: boolean) {

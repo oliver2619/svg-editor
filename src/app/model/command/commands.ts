@@ -1,7 +1,8 @@
-import { ToggleCommand, Command } from './command';
-import { MutableSvgModel } from '../svg-model';
+import { ToggleCommand, Command, ReverseCommand } from './command';
+import { MutableSvgModel, SvgModel } from '../svg-model';
 import { EllipseProperties, LineProperties, PolylineProperties, PolygonProperties, RectProperties, CircleProperties, ImageProperties, GroupProperties } from '../model-element-properties';
 import { PathProperties } from '../path-properties';
+import { GroupModel, ShapeModelType } from '../shape-model';
 
 export class SetSizeCommand extends ToggleCommand {
 
@@ -35,12 +36,12 @@ export class AddCircleCommand implements Command {
 
 	private readonly properties: CircleProperties;
 
-	constructor(private readonly id: string, properties: CircleProperties, private readonly parentId: string | undefined) {
+	constructor(private readonly id: string, properties: CircleProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
 		this.properties = { ...properties };
 	}
 
 	redo(doc: MutableSvgModel) {
-		doc.addCircle(this.id, this.properties, this.parentId);
+		doc.addCircle(this.id, this.properties, this.parentId, this.zIndex);
 	}
 
 	undo(doc: MutableSvgModel) {
@@ -52,12 +53,12 @@ export class AddEllipseCommand implements Command {
 
 	private readonly properties: EllipseProperties;
 
-	constructor(private readonly id: string, properties: EllipseProperties, private readonly parentId: string | undefined) {
+	constructor(private readonly id: string, properties: EllipseProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
 		this.properties = { ...properties };
 	}
 
 	redo(doc: MutableSvgModel) {
-		doc.addEllipse(this.id, this.properties, this.parentId);
+		doc.addEllipse(this.id, this.properties, this.parentId, this.zIndex);
 	}
 
 	undo(doc: MutableSvgModel) {
@@ -86,12 +87,12 @@ export class AddImageCommand implements Command {
 
 	private readonly properties: ImageProperties;
 
-	constructor(private readonly id: string, properties: ImageProperties, private readonly parentId: string | undefined) {
+	constructor(private readonly id: string, properties: ImageProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
 		this.properties = { ...properties };
 	}
 
 	redo(doc: MutableSvgModel) {
-		doc.addImage(this.id, this.properties, this.parentId);
+		doc.addImage(this.id, this.properties, this.parentId, this.zIndex);
 	}
 
 	undo(doc: MutableSvgModel) {
@@ -103,12 +104,12 @@ export class AddLineCommand implements Command {
 
 	private readonly properties: LineProperties;
 
-	constructor(private readonly id: string, properties: LineProperties, private readonly parentId: string | undefined) {
+	constructor(private readonly id: string, properties: LineProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
 		this.properties = { ...properties };
 	}
 
 	redo(doc: MutableSvgModel) {
-		doc.addLine(this.id, this.properties, this.parentId);
+		doc.addLine(this.id, this.properties, this.parentId, this.zIndex);
 	}
 
 	undo(doc: MutableSvgModel) {
@@ -120,12 +121,12 @@ export class AddPathCommand implements Command {
 
 	private readonly properties: PathProperties;
 
-	constructor(private readonly id: string, properties: PathProperties, private readonly parentId: string | undefined) {
+	constructor(private readonly id: string, properties: PathProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
 		this.properties = { ...properties, commands: [...properties.commands] };
 	}
 
 	redo(doc: MutableSvgModel) {
-		doc.addPath(this.id, this.properties, this.parentId);
+		doc.addPath(this.id, this.properties, this.parentId, this.zIndex);
 	}
 
 	undo(doc: MutableSvgModel) {
@@ -137,12 +138,12 @@ export class AddPolylineCommand implements Command {
 
 	private readonly properties: PolylineProperties;
 
-	constructor(private readonly id: string, properties: PolylineProperties, private readonly parentId: string | undefined) {
+	constructor(private readonly id: string, properties: PolylineProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
 		this.properties = { ...properties, points: [...properties.points] };
 	}
 
 	redo(doc: MutableSvgModel) {
-		doc.addPolyline(this.id, this.properties, this.parentId);
+		doc.addPolyline(this.id, this.properties, this.parentId, this.zIndex);
 	}
 
 	undo(doc: MutableSvgModel) {
@@ -154,12 +155,12 @@ export class AddPolygonCommand implements Command {
 
 	private readonly properties: PolygonProperties;
 
-	constructor(private readonly id: string, properties: PolygonProperties, private readonly parentId: string | undefined) {
+	constructor(private readonly id: string, properties: PolygonProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
 		this.properties = { ...properties, points: [...properties.points] };
 	}
 
 	redo(doc: MutableSvgModel) {
-		doc.addPolygon(this.id, this.properties, this.parentId);
+		doc.addPolygon(this.id, this.properties, this.parentId, this.zIndex);
 	}
 
 	undo(doc: MutableSvgModel) {
@@ -171,12 +172,12 @@ export class AddRectCommand implements Command {
 
 	private readonly properties: RectProperties;
 
-	constructor(private readonly id: string, properties: RectProperties, private readonly parentId: string | undefined) {
+	constructor(private readonly id: string, properties: RectProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
 		this.properties = { ...properties };
 	}
 
 	redo(doc: MutableSvgModel) {
-		doc.addRect(this.id, this.properties, this.parentId);
+		doc.addRect(this.id, this.properties, this.parentId, this.zIndex);
 	}
 
 	undo(doc: MutableSvgModel) {
@@ -226,5 +227,48 @@ export class TranslateShapeCommand implements Command {
 
 	undo(doc: MutableSvgModel): void {
 		doc.setShapeMnemento(this.id, this.mnemento);
+	}
+}
+
+export class Commands {
+
+	static removeShape(shapeId: string, model: SvgModel): Command {
+		const shape = model.getShapeById(shapeId);
+		const properties = shape.getMnemento();
+		const parentId = shape.parentId;
+		const zIndex = model.getShapeZIndex(shapeId);
+		switch (shape.type) {
+			case ShapeModelType.CIRCLE:
+				return new ReverseCommand(new AddCircleCommand(shapeId, properties as CircleProperties, parentId, zIndex));
+			case ShapeModelType.ELLIPSE:
+				return new ReverseCommand(new AddEllipseCommand(shapeId, properties as EllipseProperties, parentId, zIndex));
+			case ShapeModelType.GROUP:
+				return new ReverseCommand(new AddGroupCommand(shapeId, properties as GroupProperties, parentId, zIndex));
+			case ShapeModelType.IMAGE:
+				return new ReverseCommand(new AddImageCommand(shapeId, properties as ImageProperties, parentId, zIndex));
+			case ShapeModelType.LINE:
+				return new ReverseCommand(new AddLineCommand(shapeId, properties as LineProperties, parentId, zIndex));
+			case ShapeModelType.PATH:
+				return new ReverseCommand(new AddPathCommand(shapeId, properties as PathProperties, parentId, zIndex));
+			case ShapeModelType.POLYGON:
+				return new ReverseCommand(new AddPolygonCommand(shapeId, properties as PolygonProperties, parentId, zIndex));
+			case ShapeModelType.POLYLINE:
+				return new ReverseCommand(new AddPolylineCommand(shapeId, properties as PolylineProperties, parentId, zIndex));
+			case ShapeModelType.RECT:
+				return new ReverseCommand(new AddRectCommand(shapeId, properties as RectProperties, parentId, zIndex));
+			default:
+				throw new RangeError(`Removal of shape ${shapeId} not implemented`);
+		}
+	}
+
+	static removeEmptyGroup(groupId: string, model: SvgModel): Command {
+		const shape = model.getShapeById(groupId);
+		if (shape.type !== ShapeModelType.GROUP) {
+			throw new Error(`Shape ${groupId} is not a group`);
+		}
+		const properties = shape.getMnemento() as GroupProperties;
+		const parentId = shape.parentId;
+		const zIndex = model.getShapeZIndex(groupId);
+		return new ReverseCommand(new AddGroupCommand(groupId, properties, parentId, zIndex));
 	}
 }

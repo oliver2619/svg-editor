@@ -5,24 +5,23 @@ import { SingleColor } from "../color/single-color";
 import { Coordinate } from "../coordinate";
 import { LineCap, LineJoin, LinePattern } from "../line-properties";
 import { FillProperties, ShapeProperties, StrokeProperties } from "../model-element-properties";
-import { SvgModelImp } from "../model-imp/model-imp";
 import { PathCmdBezierCurveToProperties, PathCmdCloseProperties, PathCmdContinueBezierCurveToProperties, PathCmdContinueQuadCurveToProperties, PathCmdHLineProperties, PathCmdLineToProperties, PathCmdMoveProperties, PathCmdProperties, PathCmdQuadCurveToProperties, PathCmdVLineProperties } from "../path-properties";
 import { VectorEffect } from "../vector-effect";
 import { ColorNameMapper } from "./color-name-mapper";
+import { ImportBuilder, ImportContainerBuilder, ImportContentBuilder } from "./import-builder";
 
 export class SvgImporter {
 
 	private readonly idByImports = new Map<string, string>();
 
-	private constructor(private readonly svg: SVGSVGElement, private readonly model: SvgModelImp) { }
+	private constructor(private readonly svg: SVGSVGElement, private readonly builder: ImportContentBuilder) { }
 
-	static importFromString(svg: string): SvgModelImp {
+	static importFromString(svg: string, builder: ImportBuilder) {
 		const div = document.createElement('div');
 		div.innerHTML = svg;
 		const svgElement: SVGSVGElement = div.firstElementChild as SVGSVGElement;
-		const ret = new SvgModelImp(svgElement.width.baseVal.value, svgElement.height.baseVal.value);
-		new SvgImporter(svgElement, ret).importChildElements(svgElement, undefined);
-		return ret;
+		const modelBuilder = builder.newDocument(svgElement.width.baseVal.value, svgElement.height.baseVal.value);
+		new SvgImporter(svgElement, modelBuilder).importChildElements(svgElement, modelBuilder);
 	}
 
 	static getInheritedAttribute(element: SVGElement, name: string): string | undefined {
@@ -36,35 +35,35 @@ export class SvgImporter {
 		return this.getInheritedAttribute(element.parentElement as SVGElement, name);
 	}
 
-	private importChildElements(element: SVGElement, parent: string | undefined) {
+	private importChildElements(element: SVGElement, containerBuilder: ImportContainerBuilder) {
 		Array.from(element.children).forEach(c => {
 			switch (c.tagName) {
 				case 'circle':
-					this.importCircle(c as SVGCircleElement, parent);
+					this.importCircle(c as SVGCircleElement, containerBuilder);
 					break;
 				case 'ellipse':
-					this.importEllipse(c as SVGEllipseElement, parent);
+					this.importEllipse(c as SVGEllipseElement, containerBuilder);
 					break;
 				case 'g':
-					this.importGroup(c as SVGGElement, parent);
+					this.importGroup(c as SVGGElement, containerBuilder);
 					break;
 				case 'image':
-					this.importImage(c as SVGImageElement, parent);
+					this.importImage(c as SVGImageElement, containerBuilder);
 					break;
 				case 'line':
-					this.importLine(c as SVGLineElement, parent);
+					this.importLine(c as SVGLineElement, containerBuilder);
 					break;
 				case 'path':
-					this.importPath(c as SVGPathElement, parent);
+					this.importPath(c as SVGPathElement, containerBuilder);
 					break;
 				case 'polygon':
-					this.importPolygon(c as SVGPolygonElement, parent);
+					this.importPolygon(c as SVGPolygonElement, containerBuilder);
 					break;
 				case 'polyline':
-					this.importPolyline(c as SVGPolylineElement, parent);
+					this.importPolyline(c as SVGPolylineElement, containerBuilder);
 					break;
 				case 'rect':
-					this.importRect(c as SVGRectElement, parent);
+					this.importRect(c as SVGRectElement, containerBuilder);
 					break;
 				case 'defs': // ignore
 					break;
@@ -166,27 +165,27 @@ export class SvgImporter {
 		throw new RangeError(`stroke-linejoin ${att} not supported`);
 	}
 
-	private importCircle(e: SVGCircleElement, parent: string | undefined) {
-		const id = this.model.nextId;
+	private importCircle(e: SVGCircleElement, containerBuilder: ImportContainerBuilder) {
+		const id = this.builder.nextId;
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		this.model.addCircle(id, {
+		containerBuilder.circle(id, {
 			...this.importShapeProperties(e),
 			cx: e.cx.baseVal.value,
 			cy: e.cy.baseVal.value,
 			r: e.r.baseVal.value,
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e)
-		}, parent);
+		});
 	}
 
-	private importEllipse(e: SVGEllipseElement, parent: string | undefined) {
-		const id = this.model.nextId;
+	private importEllipse(e: SVGEllipseElement, containerBuilder: ImportContainerBuilder) {
+		const id = this.builder.nextId;
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		this.model.addEllipse(id, {
+		containerBuilder.ellipse(id, {
 			...this.importShapeProperties(e),
 			cx: e.cx.baseVal.value,
 			cy: e.cy.baseVal.value,
@@ -194,25 +193,25 @@ export class SvgImporter {
 			ry: e.ry.baseVal.value,
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e)
-		}, parent);
+		});
 	}
 
-	private importGroup(e: SVGGElement, parent: string | undefined) {
-		const id = this.model.nextId;
+	private importGroup(e: SVGGElement, containerBuilder: ImportContainerBuilder) {
+		const id = this.builder.nextId;
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		this.model.addGroup(id, {
+		const group = containerBuilder.group(id, {
 			...this.importShapeProperties(e),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
 			lineCap: this.importLineCap(e),
 			lineJoin: this.importLineJoin(e)
-		}, parent, undefined);
-		this.importChildElements(e, id);
+		});
+		this.importChildElements(e, group);
 	}
 
-	private importImage(e: SVGImageElement, parent: string | undefined) {
+	private importImage(e: SVGImageElement, containerBuilder: ImportContainerBuilder) {
 		const aspect = e.getAttribute('preserveAspectRatio');
 		const url = e.getAttribute('url');
 		if (aspect === null) {
@@ -228,11 +227,11 @@ export class SvgImporter {
 			default:
 				throw new RangeError(`preserveAspectRatio ${aspect} not supported`);
 		}
-		const id = this.model.nextId;
+		const id = this.builder.nextId;
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		this.model.addImage(id, {
+		containerBuilder.image(id, {
 			...this.importShapeProperties(e),
 			x: e.x.baseVal.value,
 			y: e.y.baseVal.value,
@@ -240,15 +239,15 @@ export class SvgImporter {
 			height: e.height.baseVal.value,
 			url: url,
 			preserveAspectRatio: aspect === 'xMidYMid meet'
-		}, parent);
+		});
 	}
 
-	private importLine(e: SVGLineElement, parent: string | undefined) {
-		const id = this.model.nextId;
+	private importLine(e: SVGLineElement, containerBuilder: ImportContainerBuilder) {
+		const id = this.builder.nextId;
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		this.model.addLine(id, {
+		containerBuilder.line(id, {
 			...this.importShapeProperties(e),
 			x1: e.x1.baseVal.value,
 			y1: e.y1.baseVal.value,
@@ -256,7 +255,7 @@ export class SvgImporter {
 			y2: e.y2.baseVal.value,
 			stroke: this.importStrokeProperties(e),
 			lineCap: this.importLineCap(e)
-		}, parent);
+		});
 	}
 
 	private importPathElements(e: SVGPathElement): PathCmdProperties[] {
@@ -375,56 +374,56 @@ export class SvgImporter {
 		return ret;
 	}
 
-	private importPath(e: SVGPathElement, parent: string | undefined) {
-		const id = this.model.nextId;
+	private importPath(e: SVGPathElement, containerBuilder: ImportContainerBuilder) {
+		const id = this.builder.nextId;
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		this.model.addPath(id, {
+		containerBuilder.path(id, {
 			...this.importShapeProperties(e),
 			commands: this.importPathElements(e),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
 			lineCap: this.importLineCap(e),
 			lineJoin: this.importLineJoin(e)
-		}, parent);
+		});
 	}
 
-	private importPolygon(e: SVGPolygonElement, parent: string | undefined) {
-		const id = this.model.nextId;
+	private importPolygon(e: SVGPolygonElement, containerBuilder: ImportContainerBuilder) {
+		const id = this.builder.nextId;
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		this.model.addPolygon(id, {
+		containerBuilder.polygon(id, {
 			...this.importShapeProperties(e),
 			points: Array.from(e.points).map(it => new Coordinate(it.x, it.y)),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
 			lineJoin: this.importLineJoin(e)
-		}, parent);
+		});
 	}
 
-	private importPolyline(e: SVGPolylineElement, parent: string | undefined) {
-		const id = this.model.nextId;
+	private importPolyline(e: SVGPolylineElement, containerBuilder: ImportContainerBuilder) {
+		const id = this.builder.nextId;
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		this.model.addPolyline(id, {
+		containerBuilder.polyline(id, {
 			...this.importShapeProperties(e),
 			points: Array.from(e.points).map(it => new Coordinate(it.x, it.y)),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
 			lineCap: this.importLineCap(e),
 			lineJoin: this.importLineJoin(e)
-		}, parent);
+		});
 	}
 
-	private importRect(e: SVGRectElement, parent: string | undefined) {
-		const id = this.model.nextId;
+	private importRect(e: SVGRectElement, containerBuilder: ImportContainerBuilder) {
+		const id = this.builder.nextId;
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		this.model.addRect(id, {
+		containerBuilder.rect(id, {
 			...this.importShapeProperties(e),
 			x: e.x.baseVal.value,
 			y: e.y.baseVal.value,
@@ -435,6 +434,6 @@ export class SvgImporter {
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
 			lineJoin: this.importLineJoin(e),
-		}, parent);
+		});
 	}
 }
