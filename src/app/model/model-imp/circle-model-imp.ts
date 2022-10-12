@@ -4,6 +4,7 @@ import { FillModelImp } from './fill-model-imp';
 import { StrokeModelImp } from './stroke-model-imp';
 import { CircleProperties } from '../model-element-properties';
 import { ShapeContainerBuilder } from '../svg-builder/shape-container-builder';
+import { Coordinate } from '../coordinate';
 
 export class CircleModelImp extends ShapeModelImp {
 
@@ -31,6 +32,20 @@ export class CircleModelImp extends ShapeModelImp {
 		this.stroke.buildAttributes(ellipse);
 	}
 
+	flipH(px: number): void {
+		const c = new Coordinate(this.cx, this.cy);
+		c.flipH(px);
+		this.cx = c.x;
+		this.cy = c.y;
+	}
+
+	flipV(py: number): void {
+		const c = new Coordinate(this.cx, this.cy);
+		c.flipH(py);
+		this.cx = c.x;
+		this.cy = c.y;
+	}
+
 	override getMnemento(): CircleProperties {
 		return {
 			...super.getMnemento(),
@@ -40,6 +55,21 @@ export class CircleModelImp extends ShapeModelImp {
 			fill: this.fill.getMnemento(),
 			stroke: this.stroke.getMnemento()
 		};
+	}
+
+	rotate(deg: number, px: number, py: number) {
+		const c = new Coordinate(this.cx, this.cy);
+		c.rotate(deg, px, py);
+		this.cx = c.x;
+		this.cy = c.y;
+	}
+
+	scale(sx: number, sy: number, px: number, py: number): void {
+		const c = new Coordinate(this.cx, this.cy);
+		c.scale(sx, sy, px, py);
+		this.cx = c.x;
+		this.cy = c.y;
+		this.r *= Math.sqrt(Math.abs(sx * sy));
 	}
 
 	override setMnemento(m: CircleProperties) {

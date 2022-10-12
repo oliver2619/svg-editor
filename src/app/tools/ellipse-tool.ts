@@ -41,6 +41,7 @@ export class EllipseTool extends AbstractDrawTool {
 				cy: (startY + targetY) * .5,
 				rx: Math.abs(targetX - startX) * .5,
 				ry: Math.abs(targetY - startY) * .5,
+				rotation: 0,
 				fill: this.propertiesComponent.fillProperties,
 				stroke: this.propertiesComponent.strokeProperties
 			});

@@ -1,7 +1,8 @@
 <se-shape-properties #shapeProperties [fill]="true" [global]="true" [line-join]="true" [line-cap]="true"></se-shape-properties>
 <form>
 	<div class="form-group button-list">
-		<button type="button" (click)="close()" seText="close"></button>
-		<button type="button" (click)="finish()" seText="finish"></button>
+		<button type="button" (click)="undo()" seText="tool.path.undo"></button>
+		<button type="button" (click)="close()" seText="tool.path.close"></button>
+		<button type="button" (click)="finish()" seText="tool.path.finish"></button>
 	</div>
 </form>

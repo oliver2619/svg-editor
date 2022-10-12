@@ -5,7 +5,7 @@ import { LineJoin, LineCap } from '../line-properties';
 import { VectorEffect } from '../vector-effect';
 import { SvgElementBuilderImp } from './svg-element-builder';
 
-export class EllipseBuilder implements ShapeBuilder<SVGEllipseElement>, StrokedElementBuilder, FilledElementBuilder{
+export class EllipseBuilder implements ShapeBuilder<SVGEllipseElement>, StrokedElementBuilder, FilledElementBuilder {
 
 	private readonly svg: SvgElementBuilderImp;
 	private readonly shape: ShapeBuilderImp;
@@ -17,6 +17,14 @@ export class EllipseBuilder implements ShapeBuilder<SVGEllipseElement>, StrokedE
 		this.shape = new ShapeBuilderImp(element);
 		this.fill = new FilledElementBuilderImp(element);
 		this.stroke = new StrokedElementBuilderImp(element);
+	}
+
+	setRotation(deg: number, px: number, py: number) {
+		if (deg !== 0) {
+			this.element.setAttribute('transform', `rotate(${deg} ${px} ${py})`);
+		} else {
+			this.element.removeAttribute('transform');
+		}
 	}
 
 	setEllipse(cx: number, cy: number, rx: number, ry: number) {
@@ -37,7 +45,7 @@ export class EllipseBuilder implements ShapeBuilder<SVGEllipseElement>, StrokedE
 	setId(id: string) {
 		this.svg.setId(id);
 	}
-	
+
 	setFillOpacity(opacity: number): void {
 		this.fill.setFillOpacity(opacity);
 	}

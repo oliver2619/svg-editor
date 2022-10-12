@@ -27,7 +27,7 @@ export class MoveTool extends AbstractMoveTool {
 	}
 
 	protected onMouseDown(e: ToolMouseEvent): void {
-		this.toolHelper.beginTransform(this.viewService.selectedIds);
+		this.toolHelper.beginTransform(this.viewService.getSelectedTransformableIds());
 	}
 
 	protected onMove(dx: number, dy: number, snapToDiscreteValues: boolean): void {

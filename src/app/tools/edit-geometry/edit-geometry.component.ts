@@ -7,6 +7,7 @@ export class EditGeometryTool implements Tool {
 
 	readonly cursor = 'move';
 	readonly requiresLocalCoordinates = true;
+	readonly selectionPivotVisible = false;
 
 	cleanUp(): void {
 	}
@@ -30,6 +31,8 @@ export class EditGeometryTool implements Tool {
 
 	mouseUp(e: ToolMouseEvent): void {
 	}
+
+	mouseHover(e: ToolMouseEvent): void { }
 }
 
 @Component({

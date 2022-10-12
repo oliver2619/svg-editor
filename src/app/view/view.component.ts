@@ -50,7 +50,7 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
 		if (ev.button === 0 && this.toolService.requiresLocalCoordinates === local) {
 			const tev = local ? this.viewService.mouseEventToToolMouseEvent(ev) : this.mouseEventToToolMouseEvent(ev);
 			if (this.toolService.mouseDown(tev)) {
-				(ev.target as Element).setPointerCapture(ev.pointerId);
+				((this.container as ElementRef<HTMLDivElement>).nativeElement).setPointerCapture(ev.pointerId);
 			}
 		}
 	}
@@ -58,8 +58,10 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
 	onSvgPointerMove(ev: PointerEvent, local: boolean) {
 		if (this.toolService.requiresLocalCoordinates === local) {
 			const tev = local ? this.viewService.mouseEventToToolMouseEvent(ev) : this.mouseEventToToolMouseEvent(ev);
-			if ((ev.target as Element).hasPointerCapture(ev.pointerId)) {
+			if (((this.container as ElementRef<HTMLDivElement>).nativeElement).hasPointerCapture(ev.pointerId)) {
 				this.toolService.mouseMove(tev);
+			} else {
+				this.toolService.mouseHover(tev);
 			}
 			this.hoverCoordinate.x = tev.x;
 			this.hoverCoordinate.y = tev.y;
@@ -69,10 +71,11 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
 
 	onSvgPointerUp(ev: PointerEvent, local: boolean) {
 		if (this.toolService.requiresLocalCoordinates === local) {
-			if (ev.button === 0 && (ev.target as Element).hasPointerCapture(ev.pointerId)) {
+			const target = ((this.container as ElementRef<HTMLDivElement>).nativeElement);
+			if (ev.button === 0 && target.hasPointerCapture(ev.pointerId)) {
 				const tev = local ? this.viewService.mouseEventToToolMouseEvent(ev) : this.mouseEventToToolMouseEvent(ev);
 				this.toolService.mouseUp(tev);
-				(ev.target as Element).releasePointerCapture(ev.pointerId);
+				target.releasePointerCapture(ev.pointerId);
 			}
 		}
 	}

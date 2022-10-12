@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { SettingsService } from '../settings/settings.service';
-import { ChangeDocPropertiesCommand, SetSizeCommand, AddRectCommand, AddEllipseCommand, AddLineCommand, AddPolygonCommand, AddPolylineCommand, AddPathCommand, MoveShapeZIndexCommand, AddCircleCommand, AddImageCommand, TranslateShapeCommand, AddGroupCommand, MoveShapeToGroupCommand, Commands } from './command/commands';
+import { ChangeDocPropertiesCommand, SetSizeCommand, AddRectCommand, AddEllipseCommand, AddLineCommand, AddPolygonCommand, AddPolylineCommand, AddPathCommand, MoveShapeZIndexCommand, AddCircleCommand, AddImageCommand, TranslateShapeCommand, AddGroupCommand, MoveShapeToGroupCommand, Commands, RotateShapeCommand, ScaleShapeCommand, FlipShapeCommand } from './command/commands';
 import { MutableSvgModel, SvgModel } from './svg-model';
 import { CommandList } from './command/command-list';
 import { SvgModelImp } from './model-imp/model-imp';
@@ -132,10 +132,34 @@ export class ModelService implements MutableSvgModel {
 	createSvg(builder: SvgBuilder) { this._document.createSvg(builder); }
 
 	cropImage(x: number, y: number, width: number, height: number) {
-		throw new Error("Method not implemented.");
+		const shapes = this._document.getAllTransformableShapes();
+		const cmd = new MultiCommand(shapes.map(s => new TranslateShapeCommand(s, -x, -y)));
+		cmd.add(new SetSizeCommand(width, height));
+		this._cmdList.run(cmd);
+		this.onDocumentChange.next(this);
 	}
 
 	exportSvg(): string { return this._document.exportSvg(); }
+
+	flipAllH(shapeIds: string[], px: number) {
+		const shapes = this._document.getTransformableShapes(shapeIds);
+		const cmd = new MultiCommand(shapes.map(s => new FlipShapeCommand(s, true, px)));
+		this._cmdList.run(cmd);
+		this.onDocumentChange.next(this);
+	}
+
+	flipAllV(shapeIds: string[], py: number) {
+		const shapes = this._document.getTransformableShapes(shapeIds);
+		const cmd = new MultiCommand(shapes.map(s => new FlipShapeCommand(s, false, py)));
+		this._cmdList.run(cmd);
+		this.onDocumentChange.next(this);
+	}
+
+	flipShapeH(id: string, px: number): void { throw new Error("Method not implemented."); }
+
+	flipShapeV(id: string, py: number): void { throw new Error("Method not implemented."); }
+
+	getAllTransformableShapes(): string[] { return this._document.getAllTransformableShapes(); }
 
 	getGroups(id: string): string[] { return this._document.getGroups(id); }
 
@@ -157,9 +181,7 @@ export class ModelService implements MutableSvgModel {
 
 	getTopLevelShapeIds(): string[] { return this._document.getTopLevelShapeIds(); }
 
-	getTransformableShapes(shapeId: string): string[] {
-		return this._document.getTransformableShapes(shapeId);
-	}
+	getTransformableShapes(shapeIds: string[]): string[] { return this._document.getTransformableShapes(shapeIds); }
 
 	groupElements(ids: string[]): string {
 		const idWithZ = ids.map(id => {
@@ -187,7 +209,9 @@ export class ModelService implements MutableSvgModel {
 		const builder = new SvgModelImportBuilder();
 		SvgImporter.importFromString(svg, builder);
 		this._document = builder.getModel();
-		this._document.setTitle(filename);
+		if (this._document.title === '') {
+			this._document.setTitle(filename);
+		}
 		this._cmdList = new CommandList(this._document, this.settingsService.undoHistorySize);
 		this.onDocumentChange.next(this);
 	}
@@ -213,7 +237,7 @@ export class ModelService implements MutableSvgModel {
 
 	removeAllShapes(ids: string[]) {
 		if (ids.length > 0) {
-			const shapeCommands = Array.from(new Set<string>(ids.flatMap(id => this.getTransformableShapes(id))))
+			const shapeCommands = this.getTransformableShapes(ids)
 				.map(id => {
 					const ret: { id: string, z: number } = { id, z: this.getShapeZIndex(id) };
 					return ret;
@@ -236,6 +260,32 @@ export class ModelService implements MutableSvgModel {
 		throw new Error("Method not implemented.");
 	}
 
+	rotateShape(id: string, deg: number, px: number, py: number) {
+		throw new Error("Method not implemented.");
+	}
+
+	rotateAll(shapeIds: string[], deg: number, px: number, py: number) {
+		if (shapeIds.length > 0 && deg !== 0) {
+			const shapes = this.getTransformableShapes(shapeIds);
+			const cmds = shapes.map(id => new RotateShapeCommand(id, deg, px, py));
+			this._cmdList.run(new MultiCommand(cmds));
+			this.onDocumentChange.next(this);
+		}
+	}
+
+	scaleAll(shapeIds: string[], sx: number, sy: number, px: number, py: number) {
+		if (shapeIds.length > 0 && (sx !== 1 || sy !== 1)) {
+			const shapes = this.getTransformableShapes(shapeIds);
+			const cmds = shapes.map(id => new ScaleShapeCommand(id, sx, sy, px, py));
+			this._cmdList.run(new MultiCommand(cmds));
+			this.onDocumentChange.next(this);
+		}
+	}
+
+	scaleShape(id: string, sx: number, sy: number, px: number, py: number): void {
+		throw new Error("Method not implemented.");
+	}
+
 	setShapeMnemento(id: string, m: any) {
 		throw new Error("Method not implemented.");
 	}
@@ -254,7 +304,7 @@ export class ModelService implements MutableSvgModel {
 
 	translateAll(shapeIds: string[], dx: number, dy: number) {
 		if (shapeIds.length > 0 && (dx !== 0 || dy !== 0)) {
-			const shapes = Array.from(new Set<string>(shapeIds.flatMap(id => this.getTransformableShapes(id))));
+			const shapes = this.getTransformableShapes(shapeIds);
 			const cmds = shapes.map(id => new TranslateShapeCommand(id, dx, dy));
 			this._cmdList.run(new MultiCommand(cmds));
 			this.onDocumentChange.next(this);

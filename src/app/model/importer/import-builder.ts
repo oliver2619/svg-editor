@@ -25,6 +25,8 @@ export interface ImportContainerBuilder {
 }
 
 export interface ImportContentBuilder extends ImportContainerBuilder {
+
+	title(title: string): void;
 }
 
 export interface ImportBuilder {

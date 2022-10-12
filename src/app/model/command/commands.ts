@@ -1,8 +1,8 @@
 import { ToggleCommand, Command, ReverseCommand } from './command';
 import { MutableSvgModel, SvgModel } from '../svg-model';
-import { EllipseProperties, LineProperties, PolylineProperties, PolygonProperties, RectProperties, CircleProperties, ImageProperties, GroupProperties } from '../model-element-properties';
+import { EllipseProperties, LineProperties, PolylineProperties, PolygonProperties, RectProperties, CircleProperties, ImageProperties, GroupProperties, ShapeProperties } from '../model-element-properties';
 import { PathProperties } from '../path-properties';
-import { GroupModel, ShapeModelType } from '../shape-model';
+import { ShapeModelType } from '../shape-model';
 
 export class SetSizeCommand extends ToggleCommand {
 
@@ -215,14 +215,65 @@ export class MoveShapeZIndexCommand extends ToggleCommand {
 
 export class TranslateShapeCommand implements Command {
 
-	private mnemento: any;
+	private mnemento: ShapeProperties | undefined;
 
-	constructor(private readonly id: string, private readonly dx: number, private readonly dy: number) {
-	}
+	constructor(private readonly id: string, private readonly dx: number, private readonly dy: number) { }
 
 	redo(doc: MutableSvgModel): void {
 		this.mnemento = doc.getShapeMnemento(this.id);
 		doc.translateShape(this.id, this.dx, this.dy);
+	}
+
+	undo(doc: MutableSvgModel): void {
+		doc.setShapeMnemento(this.id, this.mnemento);
+	}
+}
+
+export class RotateShapeCommand implements Command {
+
+	private mnemento: ShapeProperties | undefined;
+
+	constructor(private readonly id: string, private readonly deg: number, private readonly px: number, private readonly py: number) { }
+
+	redo(doc: MutableSvgModel): void {
+		this.mnemento = doc.getShapeMnemento(this.id);
+		doc.rotateShape(this.id, this.deg, this.px, this.py);
+	}
+
+	undo(doc: MutableSvgModel): void {
+		doc.setShapeMnemento(this.id, this.mnemento);
+	}
+}
+
+export class FlipShapeCommand implements Command {
+
+	private mnemento: ShapeProperties | undefined;
+
+	constructor(private readonly id: string, private readonly horizontally: boolean, private readonly pivot: number) { }
+
+	redo(doc: MutableSvgModel): void {
+		this.mnemento = doc.getShapeMnemento(this.id);
+		if (this.horizontally) {
+			doc.flipShapeH(this.id, this.pivot);
+		} else {
+			doc.flipShapeV(this.id, this.pivot);
+		}
+	}
+
+	undo(doc: MutableSvgModel): void {
+		doc.setShapeMnemento(this.id, this.mnemento);
+	}
+}
+
+export class ScaleShapeCommand implements Command {
+
+	private mnemento: ShapeProperties | undefined;
+
+	constructor(private readonly id: string, private readonly sx: number, private readonly sy: number, private readonly px: number, private readonly py: number) { }
+
+	redo(doc: MutableSvgModel): void {
+		this.mnemento = doc.getShapeMnemento(this.id);
+		doc.scaleShape(this.id, this.sx, this.sy, this.px, this.py);
 	}
 
 	undo(doc: MutableSvgModel): void {

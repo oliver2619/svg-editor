@@ -16,6 +16,14 @@ export class ImageBuilder implements ShapeBuilder<SVGImageElement> {
 		this.element.href.baseVal = url;
 	}
 
+	setRotation(deg: number, px: number, py: number) {
+		if (deg !== 0) {
+			this.element.setAttribute('transform', `rotate(${deg} ${px} ${py})`);
+		} else {
+			this.element.removeAttribute('transform');
+		}
+	}
+
 	setRect(x: number, y: number, width: number, height: number) {
 		this.element.x.baseVal.value = x;
 		this.element.y.baseVal.value = y;

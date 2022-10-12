@@ -36,6 +36,14 @@ export class PolylineModelImp extends ShapeModelImp {
 		this.points.forEach(p => polyline.addPoint(p.x, p.y));
 	}
 
+	flipH(px: number): void {
+		this.points.forEach(p => p.flipH(px));
+	}
+
+	flipV(py: number): void {
+		this.points.forEach(p => p.flipV(py));
+	}
+
 	override getMnemento(): PolylineProperties {
 		return {
 			...super.getMnemento(),
@@ -45,6 +53,14 @@ export class PolylineModelImp extends ShapeModelImp {
 			lineJoin: this.lineJoin,
 			lineCap: this.lineCap
 		};
+	}
+
+	rotate(deg: number, px: number, py: number) {
+		this.points.forEach(p => p.rotate(deg, px, py));
+	}
+
+	scale(sx: number, sy: number, px: number, py: number): void {
+		this.points.forEach(p => p.scale(sx, sy, px, py));
 	}
 
 	override setMnemento(m: PolylineProperties) {

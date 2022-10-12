@@ -22,6 +22,10 @@ export abstract class ShapeModelImp implements ShapeModel {
 
 	abstract buildSvg(builder: ShapeContainerBuilder): void;
 
+	abstract flipH(px: number): void;
+
+	abstract flipV(py: number): void;
+
 	getGroups(): string[] { return []; }
 
 	getMnemento(): ShapeProperties {
@@ -32,6 +36,10 @@ export abstract class ShapeModelImp implements ShapeModel {
 	}
 
 	getTransformableShapes(): string[] { return [this.id]; }
+
+	abstract rotate(deg: number, px: number, py: number): void;
+
+	abstract scale(sx: number, sy: number, px: number, py: number): void;
 
 	setMnemento(m: ShapeProperties) {
 		this._opacity = m.opacity;

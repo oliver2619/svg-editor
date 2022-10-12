@@ -2,6 +2,7 @@ import { PathProperties } from "../path-properties";
 import { CircleProperties, EllipseProperties, GroupProperties, ImageProperties, LineProperties, PolygonProperties, PolylineProperties, RectProperties } from "../model-element-properties";
 import { ImportBuilder, ImportContainerBuilder, ImportContentBuilder } from "./import-builder";
 import { SvgModelImp } from "../model-imp/model-imp";
+import { ModelAction } from "src/app/shared/action/model-action";
 
 export class SvgModelImportBuilder implements ImportBuilder {
 
@@ -26,10 +27,14 @@ class SvgModelContentImportBuilder implements ImportContentBuilder {
 
 	get nextId(): string { return this.container.nextId; }
 
-	constructor(model: SvgModelImp) {
+	constructor(private readonly model: SvgModelImp) {
 		this.container = new SvgContainerImportBuilder(model, undefined);
 	}
 
+	title(title: string): void {
+		this.model.setTitle(title);
+	}
+	
 	rect(id: string, properties: RectProperties): void {
 		this.container.rect(id, properties);
 	}

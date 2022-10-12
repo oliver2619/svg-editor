@@ -2,7 +2,6 @@ import { Dictionary } from "../dictionary";
 
 export const DICTIONARY_EN: Dictionary = {
 	angle: 'Angle',
-	close: 'Close',
 	'colorDialog.context': 'From context',
 	'colorDialog.linearGradient': 'Linear gradient',
 	'colorDialog.none': 'None',
@@ -47,7 +46,6 @@ export const DICTIONARY_EN: Dictionary = {
 	'editMode.select': 'Selectmode',
 	'errorHandler.defaultMessage': 'Unexpected error occurred. See browser log for technical details.',
 	filename: 'Filename',
-	finish: 'Finish',
 	fontFamily: 'Font family',
 	height: 'Height',
 	help: 'Help',
@@ -109,6 +107,9 @@ export const DICTIONARY_EN: Dictionary = {
 	'tool.move.hint': '[Shift]: Move along distinct angles',
 	'tool.panning': 'Scoll canvas',
 	'tool.path': 'Draw path',
+	'tool.path.close': 'Close',
+	'tool.path.finish': 'Finish',
+	'tool.path.undo': 'Undo',
 	'tool.path.help': '[Ctrl]: Quadratic curve point, [Shift]: New curve',
 	'tool.pencil': 'Draw with pencil',
 	'tool.pencil.angleLimit': 'Angle limit',
@@ -120,6 +121,7 @@ export const DICTIONARY_EN: Dictionary = {
 	'tool.rect.rx': 'x Radius',
 	'tool.rect.ry': 'y Radius',
 	'tool.rotate': 'Rotate objects',
+	'tool.rotate.hint': '[Shift]: Rotate by distinct angles',
 	'tool.scale': 'Scale objects',
 	'tool.select': 'Select objects',
 	'tool.select.all': 'All elements',

@@ -54,8 +54,8 @@ export class ToolService implements Tools {
 		pipette: new PipetteTool(),
 		polygon: new PolygonTool(this.viewService),
 		rect: new RectTool(this.viewService),
-		rotate: new RotateTool(),
-		scale: new ScaleTool(),
+		rotate: new RotateTool(this.viewService),
+		scale: new ScaleTool(this.viewService),
 		select: new SelectTool(this.viewService),
 		selectRect: new SelectRectTool(this.viewService),
 		text: new TextTool(this.viewService),
@@ -78,6 +78,7 @@ export class ToolService implements Tools {
 			if (toolId !== undefined) {
 				this.settingsService.merge(settings => settings.tools.currentTool = toolId);
 			}
+			this.viewService.selectionLayer.pivotVisible = this._current.selectionPivotVisible;
 			this.onToolChange.next(this);
 		}
 	}
@@ -113,5 +114,9 @@ export class ToolService implements Tools {
 
 	mouseUp(ev: ToolMouseEvent) {
 		this._current.mouseUp(ev);
+	}
+
+	mouseHover(ev: ToolMouseEvent) {
+		this._current.mouseHover(ev);
 	}
 }

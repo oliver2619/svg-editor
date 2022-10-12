@@ -74,14 +74,14 @@ export class ActionService {
 			icon: 'icons/draw_clone.png'
 		}),
 		'edit.flip.horizontally': new ViewAction(this.viewService, {
-			action: view => { },
+			action: view => view.flipSelectedH(),
 			enabled: view => view.isAnyShapeSelected,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.flip.horizontally'),
 			icon: 'icons/shape_flip_horizontal.png'
 		}),
 		'edit.flip.vertically': new ViewAction(this.viewService, {
-			action: view => { },
+			action: view => view.flipSelectedV(),
 			enabled: view => view.isAnyShapeSelected,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.flip.vertically'),

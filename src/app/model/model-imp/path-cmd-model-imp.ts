@@ -1,5 +1,6 @@
 import { PathElementsBuilder } from '../svg-builder/path-builder';
-import { PathCmdProperties, PathCmdMoveProperties, PathCmdHLineProperties, PathCmdVLineProperties, PathCmdLineToProperties, PathCmdCloseProperties, PathCmdBezierCurveToProperties, PathCmdContinueBezierCurveToProperties, PathCmdQuadCurveToProperties, PathCmdContinueQuadCurveToProperties } from '../path-properties';
+import { PathCmdProperties, PathCmdMoveProperties, PathCmdLineToProperties, PathCmdCloseProperties, PathCmdBezierCurveToProperties, PathCmdContinueBezierCurveToProperties, PathCmdQuadCurveToProperties, PathCmdContinueQuadCurveToProperties } from '../path-properties';
+import { Coordinate } from '../coordinate';
 
 export abstract class PathCmdModelImp {
 
@@ -9,10 +10,6 @@ export abstract class PathCmdModelImp {
 		switch (properties.cmd) {
 			case 'M':
 				return new PathCmdMoveToModelImp(properties as PathCmdMoveProperties);
-			case 'H':
-				return new PathCmdHLineToModelImp(properties as PathCmdHLineProperties);
-			case 'V':
-				return new PathCmdVLineToModelImp(properties as PathCmdVLineProperties);
 			case 'L':
 				return new PathCmdLineToModelImp(properties as PathCmdLineToProperties);
 			case 'C':
@@ -30,9 +27,19 @@ export abstract class PathCmdModelImp {
 		}
 	}
 
+	flipH(px: number) { this.processVertices(c => c.flipH(px)); }
+
+	flipV(py: number) { this.processVertices(c => c.flipV(py)); }
+
 	abstract getMnemento(): PathCmdProperties;
 
-	abstract translate(dx: number, dy: number): void;
+	rotate(deg: number, px: number, py: number) { this.processVertices(c => c.rotate(deg, px, py)); }
+
+	scale(sx: number, sy: number, px: number, py: number): void { this.processVertices(c => c.scale(sx, sy, px, py)); }
+
+	translate(dx: number, dy: number) { this.processVertices(c => c.translate(dx, dy)); }
+
+	protected abstract processVertices(f: (c: Coordinate) => any): void;
 }
 
 class PathCmdMoveToModelImp extends PathCmdModelImp {
@@ -56,55 +63,11 @@ class PathCmdMoveToModelImp extends PathCmdModelImp {
 		}
 	}
 
-	translate(dx: number, dy: number) {
-		this.x += dx;
-		this.y += dy;
-	}
-}
-
-class PathCmdHLineToModelImp extends PathCmdModelImp {
-
-	private x: number;
-
-	constructor(props: PathCmdHLineProperties) {
-		super();
-		this.x = props.x;
-	}
-
-	buildPathElement(builder: PathElementsBuilder) { builder.horizontalLineTo(this.x); }
-
-	getMnemento(): PathCmdHLineProperties {
-		return {
-			cmd: 'H',
-			x: this.x
-		}
-	}
-
-	translate(dx: number, dy: number) {
-		this.x += dx;
-	}
-}
-
-class PathCmdVLineToModelImp extends PathCmdModelImp {
-
-	private y: number;
-
-	constructor(props: PathCmdVLineProperties) {
-		super();
-		this.y = props.y;
-	}
-
-	buildPathElement(builder: PathElementsBuilder) { builder.verticalLineTo(this.y); }
-
-	getMnemento(): PathCmdVLineProperties {
-		return {
-			cmd: 'V',
-			y: this.y
-		}
-	}
-
-	translate(dx: number, dy: number) {
-		this.y += dy;
+	protected processVertices(f: (c: Coordinate) => any): void {
+		const c = new Coordinate(this.x, this.y);
+		f(c);
+		this.x = c.x;
+		this.y = c.y;
 	}
 }
 
@@ -129,9 +92,11 @@ class PathCmdLineToModelImp extends PathCmdModelImp {
 		}
 	}
 
-	translate(dx: number, dy: number) {
-		this.x += dx;
-		this.y += dy;
+	protected processVertices(f: (c: Coordinate) => any): void {
+		const c = new Coordinate(this.x, this.y);
+		f(c);
+		this.x = c.x;
+		this.y = c.y;
 	}
 }
 
@@ -168,13 +133,19 @@ class PathCmdBezierCurveToModelImp extends PathCmdModelImp {
 		}
 	}
 
-	translate(dx: number, dy: number) {
-		this.hx1 += dx;
-		this.hy1 += dy;
-		this.hx2 += dx;
-		this.hy2 += dy;
-		this.x += dx;
-		this.y += dy;
+	protected processVertices(f: (c: Coordinate) => any): void {
+		let c = new Coordinate(this.hx1, this.hy1);
+		f(c);
+		this.hx1 = c.x;
+		this.hy1 = c.y;
+		c = new Coordinate(this.hx2, this.hy2);
+		f(c);
+		this.hx2 = c.x;
+		this.hy2 = c.y;
+		c = new Coordinate(this.x, this.y);
+		f(c);
+		this.x = c.x;
+		this.y = c.y;
 	}
 }
 
@@ -205,11 +176,15 @@ class PathCmdContinueCurveToModelImp extends PathCmdModelImp {
 		}
 	}
 
-	translate(dx: number, dy: number) {
-		this.hx += dx;
-		this.hy += dy;
-		this.x += dx;
-		this.y += dy;
+	protected processVertices(f: (c: Coordinate) => any): void {
+		let c = new Coordinate(this.hx, this.hy);
+		f(c);
+		this.hx = c.x;
+		this.hy = c.y;
+		c = new Coordinate(this.x, this.y);
+		f(c);
+		this.x = c.x;
+		this.y = c.y;
 	}
 }
 
@@ -240,11 +215,15 @@ class PathCmdQuadCurveToModelImp extends PathCmdModelImp {
 		}
 	}
 
-	translate(dx: number, dy: number) {
-		this.hx += dx;
-		this.hy += dy;
-		this.x += dx;
-		this.y += dy;
+	protected processVertices(f: (c: Coordinate) => any): void {
+		let c = new Coordinate(this.hx, this.hy);
+		f(c);
+		this.hx = c.x;
+		this.hy = c.y;
+		c = new Coordinate(this.x, this.y);
+		f(c);
+		this.x = c.x;
+		this.y = c.y;
 	}
 }
 
@@ -269,9 +248,11 @@ class PathCmdContinueQuadCurveToModelImp extends PathCmdModelImp {
 		}
 	}
 
-	translate(dx: number, dy: number) {
-		this.x += dx;
-		this.y += dy;
+	protected processVertices(f: (c: Coordinate) => any): void {
+		const c = new Coordinate(this.x, this.y);
+		f(c);
+		this.x = c.x;
+		this.y = c.y;
 	}
 }
 
@@ -289,6 +270,6 @@ class PathCmdCloseModelImp extends PathCmdModelImp {
 		}
 	}
 
-	translate(dx: number, dy: number) { }
+	protected processVertices(f: (c: Coordinate) => any): void { }
 }
 

@@ -11,6 +11,14 @@ export interface ShapeProperties extends ModelElementProperties {
 	vectorEffect: VectorEffect;
 }
 
+export interface BoxProperties extends ShapeProperties{
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	rotation: number;
+}
+
 export interface StrokeProperties {
 	color: Color;
 	linePattern: LinePattern;
@@ -33,6 +41,7 @@ export interface EllipseProperties extends ShapeProperties {
 	cy: number;
 	rx: number;
 	ry: number;
+	rotation: number;
 	fill: FillProperties;
 	stroke: StrokeProperties;
 }
@@ -44,11 +53,7 @@ export interface GroupProperties extends ShapeProperties {
 	lineJoin?: LineJoin;
 }
 
-export interface ImageProperties extends ShapeProperties {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
+export interface ImageProperties extends BoxProperties {
 	url: string;
 	preserveAspectRatio: boolean;
 }
@@ -84,11 +89,7 @@ export interface PolygonProperties extends ShapeProperties {
 	lineJoin: LineJoin;
 }
 
-export interface RectProperties extends ShapeProperties {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
+export interface RectProperties extends BoxProperties {
 	rx: number;
 	ry: number;
 	fill: FillProperties;

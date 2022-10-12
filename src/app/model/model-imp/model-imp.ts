@@ -144,6 +144,12 @@ export class SvgModelImp implements MutableSvgModel {
 		return outer.innerHTML;
 	}
 
+	flipShapeH(id: string, px: number): void { this.getShapeById(id).flipH(px); }
+
+	flipShapeV(id: string, py: number): void { this.getShapeById(id).flipV(py); }
+
+	getAllTransformableShapes(): string[] { return this.getTransformableShapes(this.shapeContainer.getTopLevelShapes().map(it => it.id)); }
+
 	getGroups(id: string): string[] {
 		return this.getShapeById(id).getGroups();
 	}
@@ -205,8 +211,8 @@ export class SvgModelImp implements MutableSvgModel {
 
 	getTopLevelShapeIds(): string[] { return this.shapeContainer.getTopLevelShapes().map(s => s.id); }
 
-	getTransformableShapes(shapeId: string): string[] {
-		return this.getShapeById(shapeId).getTransformableShapes();
+	getTransformableShapes(shapeIds: string[]): string[] {
+		return Array.from(new Set<string>(shapeIds.flatMap(id => this.getShapeById(id).getTransformableShapes())));
 	}
 
 	hasShape(id: string): boolean { return this.shapesById.get(id) !== undefined; }
@@ -262,6 +268,10 @@ export class SvgModelImp implements MutableSvgModel {
 			this.shapeContainer.removeShape(id);
 		}
 	}
+
+	rotateShape(id: string, deg: number, px: number, py: number) { this.getShapeById(id).rotate(deg, px, py); }
+
+	scaleShape(id: string, sx: number, sy: number, px: number, py: number): void { this.getShapeById(id).scale(sx, sy, px, py); }
 
 	setShapeMnemento(id: string, m: any) { this.getShapeById(id).setMnemento(m); }
 

@@ -36,6 +36,14 @@ export class PathModelImp extends ShapeModelImp {
 		this.path.forEach(p => p.buildPathElement(path.path));
 	}
 
+	flipH(px: number): void {
+		this.path.forEach(p => p.flipH(px));
+	}
+
+	flipV(py: number): void {
+		this.path.forEach(p => p.flipV(py));
+	}
+
 	override getMnemento(): PathProperties {
 		return {
 			...super.getMnemento(),
@@ -45,6 +53,14 @@ export class PathModelImp extends ShapeModelImp {
 			lineCap: this.lineCap,
 			commands: this.path.map(p => p.getMnemento())
 		};
+	}
+
+	rotate(deg: number, px: number, py: number) {
+		this.path.forEach(p => p.rotate(deg, px, py));
+	}
+
+	scale(sx: number, sy: number, px: number, py: number): void {
+		this.path.forEach(p => p.scale(sx, sy, px, py));
 	}
 
 	override setMnemento(m: PathProperties) {

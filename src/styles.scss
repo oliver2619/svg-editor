@@ -137,6 +137,11 @@ svg.canvas {
 		vector-effect: non-scaling-stroke;
 	}
 	
+	circle.pivot {
+		stroke: none;
+		fill: #ff4040;
+	}
+
 	rect.selection, circle.selection {
 		@include dashed-black-line;
 		stroke: #ff4040;

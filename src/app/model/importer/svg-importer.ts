@@ -5,7 +5,7 @@ import { SingleColor } from "../color/single-color";
 import { Coordinate } from "../coordinate";
 import { LineCap, LineJoin, LinePattern } from "../line-properties";
 import { FillProperties, ShapeProperties, StrokeProperties } from "../model-element-properties";
-import { PathCmdBezierCurveToProperties, PathCmdCloseProperties, PathCmdContinueBezierCurveToProperties, PathCmdContinueQuadCurveToProperties, PathCmdHLineProperties, PathCmdLineToProperties, PathCmdMoveProperties, PathCmdProperties, PathCmdQuadCurveToProperties, PathCmdVLineProperties } from "../path-properties";
+import { PathCmdBezierCurveToProperties, PathCmdCloseProperties, PathCmdContinueBezierCurveToProperties, PathCmdContinueQuadCurveToProperties, PathCmdLineToProperties, PathCmdMoveProperties, PathCmdProperties, PathCmdQuadCurveToProperties } from "../path-properties";
 import { VectorEffect } from "../vector-effect";
 import { ColorNameMapper } from "./color-name-mapper";
 import { ImportBuilder, ImportContainerBuilder, ImportContentBuilder } from "./import-builder";
@@ -21,7 +21,8 @@ export class SvgImporter {
 		div.innerHTML = svg;
 		const svgElement: SVGSVGElement = div.firstElementChild as SVGSVGElement;
 		const modelBuilder = builder.newDocument(svgElement.width.baseVal.value, svgElement.height.baseVal.value);
-		new SvgImporter(svgElement, modelBuilder).importChildElements(svgElement, modelBuilder);
+		const importer = new SvgImporter(svgElement, modelBuilder);
+		importer.importSvg();
 	}
 
 	static getInheritedAttribute(element: SVGElement, name: string): string | undefined {
@@ -33,6 +34,14 @@ export class SvgImporter {
 			return undefined;
 		}
 		return this.getInheritedAttribute(element.parentElement as SVGElement, name);
+	}
+
+	private importSvg() {
+		const title = this.svg.querySelector('title');
+		if (title !== null && title.textContent !== null) {
+			this.builder.title(title.textContent);
+		}
+		this.importChildElements(this.svg, this.builder);
 	}
 
 	private importChildElements(element: SVGElement, containerBuilder: ImportContainerBuilder) {
@@ -66,6 +75,7 @@ export class SvgImporter {
 					this.importRect(c as SVGRectElement, containerBuilder);
 					break;
 				case 'defs': // ignore
+				case 'title': // ignore
 					break;
 				default:
 					throw new Error(`Unable to process element ${c.tagName}`);
@@ -165,6 +175,19 @@ export class SvgImporter {
 		throw new RangeError(`stroke-linejoin ${att} not supported`);
 	}
 
+	private importRotation(e: SVGElement, px: number, py: number): number {
+		const transform = e.getAttribute('transform');
+		if(transform === null) {
+			return 0;
+		}
+		const result = /^\s*rotate\(\s*(-?\d*\.?\d*)\s+(-?\d*\.?\d*)\s+(-?\d*\.?\d*)\s*\)\s*$/.exec(transform);
+		if(result === null) {
+			throw new Error(`Unable to import transformation '${transform}'.`);
+		}
+		const rad = Number(result[1]);
+		return rad;
+	}
+
 	private importCircle(e: SVGCircleElement, containerBuilder: ImportContainerBuilder) {
 		const id = this.builder.nextId;
 		if (e.id !== '') {
@@ -191,6 +214,7 @@ export class SvgImporter {
 			cy: e.cy.baseVal.value,
 			rx: e.rx.baseVal.value,
 			ry: e.ry.baseVal.value,
+			rotation: this.importRotation(e, e.cx.baseVal.value, e.cy.baseVal.value),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e)
 		});
@@ -237,6 +261,7 @@ export class SvgImporter {
 			y: e.y.baseVal.value,
 			width: e.width.baseVal.value,
 			height: e.height.baseVal.value,
+			rotation: this.importRotation(e, e.x.baseVal.value, e.y.baseVal.value),
 			url: url,
 			preserveAspectRatio: aspect === 'xMidYMid meet'
 		});
@@ -265,104 +290,134 @@ export class SvgImporter {
 		}
 		const elements = d.split(/[ ,]+/);
 		const ret: PathCmdProperties[] = [];
+		let first: Coordinate | undefined;
+		let last: Coordinate | undefined;
 		for (let i = 0; i < elements.length; ++i) {
 			switch (elements[i]) {
 				case 'M':
 					{
+						const x = Number.parseFloat(elements[i + 1]);
+						const y = Number.parseFloat(elements[i + 2]);
+						i += 2;
 						const p: PathCmdMoveProperties = {
 							cmd: 'M',
-							x: Number.parseFloat(elements[i + 1]),
-							y: Number.parseFloat(elements[i + 2])
+							x,
+							y
 						};
-						i += 2;
 						ret.push(p);
+						last = new Coordinate(x, x);
+						first = last.clone();
 					}
 					break;
 				case 'V':
 					{
-						const p: PathCmdVLineProperties = {
-							cmd: 'V',
-							y: Number.parseFloat(elements[i + 2])
-						};
+						const x = last !== undefined ? last.x : 0;
+						const y = Number.parseFloat(elements[i + 1]);
 						i += 1;
+						const p: PathCmdLineToProperties = {
+							cmd: 'L',
+							x,
+							y
+						};
 						ret.push(p);
+						last = new Coordinate(x, x);
 					}
 					break;
 				case 'H':
 					{
-						const p: PathCmdHLineProperties = {
-							cmd: 'H',
-							x: Number.parseFloat(elements[i + 1])
-						};
+						const x = Number.parseFloat(elements[i + 1]);
+						const y = last !== undefined ? last.y : 0;
 						i += 1;
+						const p: PathCmdLineToProperties = {
+							cmd: 'L',
+							x,
+							y
+						};
 						ret.push(p);
+						last = new Coordinate(x, x);
 					}
 					break;
 				case 'L':
 					{
+						const x = Number.parseFloat(elements[i + 1]);
+						const y = Number.parseFloat(elements[i + 2]);
+						i += 2;
 						const p: PathCmdLineToProperties = {
 							cmd: 'L',
-							x: Number.parseFloat(elements[i + 1]),
-							y: Number.parseFloat(elements[i + 2])
+							x,
+							y
 						};
-						i += 2;
 						ret.push(p);
+						last = new Coordinate(x, y);
 					}
 					break;
 				case 'C':
 					{
+						const x = Number.parseFloat(elements[i + 5]);
+						const y = Number.parseFloat(elements[i + 6]);
 						const p: PathCmdBezierCurveToProperties = {
 							cmd: 'C',
 							hx1: Number.parseFloat(elements[i + 1]),
 							hy1: Number.parseFloat(elements[i + 2]),
 							hx2: Number.parseFloat(elements[i + 3]),
 							hy2: Number.parseFloat(elements[i + 4]),
-							x: Number.parseFloat(elements[i + 5]),
-							y: Number.parseFloat(elements[i + 6])
+							x,
+							y
 						};
 						i += 6;
 						ret.push(p);
+						last = new Coordinate(x, y);
 					}
 					break;
 				case 'S':
 					{
+						const x = Number.parseFloat(elements[i + 3]);
+						const y = Number.parseFloat(elements[i + 4]);
 						const p: PathCmdContinueBezierCurveToProperties = {
 							cmd: 'S',
 							hx: Number.parseFloat(elements[i + 1]),
 							hy: Number.parseFloat(elements[i + 2]),
-							x: Number.parseFloat(elements[i + 3]),
-							y: Number.parseFloat(elements[i + 4])
+							x,
+							y
 						};
 						i += 4;
 						ret.push(p);
+						last = new Coordinate(x, y);
 					}
 					break;
 				case 'Q':
 					{
+						const x = Number.parseFloat(elements[i + 3]);
+						const y = Number.parseFloat(elements[i + 4]);
 						const p: PathCmdQuadCurveToProperties = {
 							cmd: 'Q',
 							hx: Number.parseFloat(elements[i + 1]),
 							hy: Number.parseFloat(elements[i + 2]),
-							x: Number.parseFloat(elements[i + 3]),
-							y: Number.parseFloat(elements[i + 4])
+							x,
+							y
 						};
 						i += 4;
 						ret.push(p);
+						last = new Coordinate(x, y);
 					}
 					break;
 				case 'T':
 					{
+						const x = Number.parseFloat(elements[i + 1]);
+						const y = Number.parseFloat(elements[i + 2]);
 						const p: PathCmdContinueQuadCurveToProperties = {
 							cmd: 'T',
-							x: Number.parseFloat(elements[i + 1]),
-							y: Number.parseFloat(elements[i + 2])
+							x,
+							y
 						};
 						i += 2;
 						ret.push(p);
+						last = new Coordinate(x, y);
 					}
 					break;
 				case 'Z':
 					{
+						last = first?.clone();
 						const p: PathCmdCloseProperties = { cmd: 'Z' };
 						ret.push(p);
 					}
@@ -431,6 +486,7 @@ export class SvgImporter {
 			height: e.height.baseVal.value,
 			rx: e.rx.baseVal.value,
 			ry: e.ry.baseVal.value,
+			rotation: this.importRotation(e, e.x.baseVal.value, e.y.baseVal.value),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
 			lineJoin: this.importLineJoin(e),

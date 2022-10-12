@@ -36,6 +36,7 @@ export class ImageTool extends AbstractDrawTool {
 				y: Math.min(startY, targetY),
 				width: Math.abs(targetX - startX),
 				height: Math.abs(targetY - startY),
+				rotation: 0,
 				url: this.component.imageUrl,
 				opacity: this.component.opacity,
 				vectorEffect: 'none',

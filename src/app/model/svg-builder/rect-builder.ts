@@ -19,6 +19,14 @@ export class RectBuilder implements ShapeBuilder<SVGRectElement>, StrokedElement
 		this.stroke = new StrokedElementBuilderImp(element);
 	}
 
+	setRotation(deg: number, px: number, py: number) {
+		if (deg !== 0) {
+			this.element.setAttribute('transform', `rotate(${deg} ${px} ${py})`);
+		} else {
+			this.element.removeAttribute('transform');
+		}
+	}
+
 	setRadius(rx: number, ry: number) {
 		if (rx > 0) {
 			this.element.rx.baseVal.value = rx;

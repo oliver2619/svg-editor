@@ -7,7 +7,7 @@ import { SettingsService } from '../settings/settings.service';
 import { SvgModel } from '../model/svg-model';
 import { SvgBuilder } from '../model/svg-builder/svg-builder';
 import { EllipseProperties, LineProperties, RectProperties, PolylineProperties, PolygonProperties, CircleProperties, ImageProperties } from '../model/model-element-properties';
-import { SelectionHandle } from './selection-handle';
+import { SelectionLayer } from './selection-layer';
 import { Coordinate } from '../model/coordinate';
 import { PathProperties } from '../model/path-properties';
 import { GroupModel } from '../model/shape-model';
@@ -26,10 +26,10 @@ export class ViewService implements View {
 
 	readonly onViewChange = new Subject<View>();
 
-	readonly svg: SVGSVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	get svg(): SVGSVGElement { return this.svgBuilder.element; }
 
 	// keep the order of initialization!
-	private readonly svgBuilder = new SvgBuilder(this.svg);
+	private readonly svgBuilder = new SvgBuilder();
 	private readonly globalGroupBuilder = this.svgBuilder.group();
 	private readonly backgroundRectBuilder = this.globalGroupBuilder.rect(ViewService.PADDING, ViewService.PADDING, 1, 1);
 	private readonly contentSvgBuilder = this.globalGroupBuilder.svg();
@@ -37,7 +37,7 @@ export class ViewService implements View {
 	readonly toolGroupBuilder = this.globalGroupBuilder.group();
 	readonly measureGroupBuilder = this.globalGroupBuilder.group();
 	private readonly selectionGroupBuilder = this.globalGroupBuilder.group();
-	private readonly selectionHandle = new SelectionHandle(this.selectionGroupBuilder, this);
+	readonly selectionLayer = new SelectionLayer(this.selectionGroupBuilder, this);
 
 	private _selectedIds: string[] = [];
 	private _zoom: number = 1;
@@ -205,6 +205,22 @@ export class ViewService implements View {
 	convertToPath() {
 	}
 
+	flipSelectedH() {
+		const bb = this.getSelectionBoundingBox();
+		if (bb !== undefined) {
+			const px = bb.x + bb.width * .5;
+			this.modelService.flipAllH([...this._selectedIds], px);
+		}
+	}
+
+	flipSelectedV() {
+		const bb = this.getSelectionBoundingBox();
+		if (bb !== undefined) {
+			const py = bb.y + bb.height * .5;
+			this.modelService.flipAllV([...this._selectedIds], py);
+		}
+	}
+
 	getElementsByPoint(x: number, y: number, all: boolean, groups: boolean): string[] {
 		const point = this.svg.createSVGPoint();
 		point.x = x;
@@ -235,7 +251,10 @@ export class ViewService implements View {
 		return this._selectedIds
 			.map(id => svg.getElementById(id))
 			.filter(e => e !== null).map(e => e as SVGGeometryElement)
-			.map(e => e.getBBox({ clipped: true, fill: true, stroke: true, markers: true }))
+			.map(e => {
+				const ret = e.getBBox({ stroke: true });
+				return ret;
+			})
 			.reduce((prev: SVGRect | undefined, cur: SVGRect) => {
 				if (prev === undefined) {
 					return cur;
@@ -250,6 +269,8 @@ export class ViewService implements View {
 				}
 			}, undefined);
 	}
+
+	getSelectedTransformableIds(): string[] { return this.modelService.getTransformableShapes(this._selectedIds); }
 
 	groupSelected() {
 		if (this._selectedIds.length > 0) {
@@ -315,6 +336,14 @@ export class ViewService implements View {
 		}
 	}
 
+	rotateSelected(deg: number, px: number, py: number) {
+		this.modelService.rotateAll([...this._selectedIds], deg, px, py);
+	}
+
+	scaleSelected(sx: number, sy: number, px: number, py: number) {
+		this.modelService.scaleAll([...this._selectedIds], sx, sy, px, py);
+	}
+
 	scrollTo(x: number, y: number) {
 		const parent = this.svg.parentElement as HTMLElement;
 		parent.scrollTo(x, y);
@@ -340,6 +369,16 @@ export class ViewService implements View {
 	setEditModeCurrentTranslation(dx: number, dy: number) {
 		this.toolGroupBuilder.setAttribute('transform', `translate(${ViewService.PADDING + dx}, ${ViewService.PADDING + dy})`);
 		this.selectionGroupBuilder.setAttribute('transform', `translate(${ViewService.PADDING + dx}, ${ViewService.PADDING + dy})`);
+	}
+
+	setEditModeCurrentRotation(deg: number, px: number, py: number) {
+		this.toolGroupBuilder.setAttribute('transform', `translate(${ViewService.PADDING}, ${ViewService.PADDING}) rotate(${deg} ${px} ${py})`);
+		this.selectionGroupBuilder.setAttribute('transform', `translate(${ViewService.PADDING}, ${ViewService.PADDING}) rotate(${deg} ${px} ${py})`);
+	}
+
+	setEditModeCurrentScale(sx: number, sy: number, px: number, py: number) {
+		this.toolGroupBuilder.setAttribute('transform', `translate(${ViewService.PADDING + px}, ${ViewService.PADDING + py}) scale(${sx}, ${sy}) translate(${-px}, ${-py})`);
+		this.selectionGroupBuilder.setAttribute('transform', `translate(${ViewService.PADDING + px}, ${ViewService.PADDING + py}) scale(${sx}, ${sy}) translate(${-px}, ${-py})`);
 	}
 
 	setZoom(factor: number) {

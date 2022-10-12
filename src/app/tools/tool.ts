@@ -9,6 +9,7 @@ export interface Tool {
 
 	readonly cursor: string;
 	readonly requiresLocalCoordinates: boolean;
+	readonly selectionPivotVisible: boolean;
 
 	cleanUp(): void;
 
@@ -21,6 +22,8 @@ export interface Tool {
 	mouseMove(e: ToolMouseEvent): void;
 
 	mouseUp(e: ToolMouseEvent): void;
+
+	mouseHover(e: ToolMouseEvent): void;
 }
 
 export abstract class AbstractMoveTool implements Tool {
@@ -29,6 +32,8 @@ export abstract class AbstractMoveTool implements Tool {
 	private y: number = 0;
 
 	get cursor(): string { return 'move'; }
+
+	get selectionPivotVisible(): boolean { return false; }
 
 	constructor(readonly requiresLocalCoordinates: boolean) { }
 
@@ -53,6 +58,8 @@ export abstract class AbstractMoveTool implements Tool {
 		this.onMouseUp(e.x - this.x, e.y - this.y, e.shiftKey);
 	}
 
+	mouseHover(e: ToolMouseEvent): void { }
+
 	protected abstract onMouseDown(e: ToolMouseEvent): void;
 
 	protected abstract onMove(dx: number, dy: number, snapToDiscreteValues: boolean): void;
@@ -63,6 +70,7 @@ export abstract class AbstractMoveTool implements Tool {
 export abstract class AbstractRectSelectTool implements Tool {
 
 	readonly cursor = 'crosshair';
+	readonly selectionPivotVisible = false;
 	readonly requiresLocalCoordinates = true;
 
 	private startX = 0;
@@ -110,6 +118,8 @@ export abstract class AbstractRectSelectTool implements Tool {
 		this.processMouse(e, true);
 	}
 
+	mouseHover(e: ToolMouseEvent): void { }
+
 	protected abstract onSelect(x: number, y: number, width: number, height: number, mode: ViewSelectMode): void;
 
 	private processMouse(e: ToolMouseEvent, finish: boolean) {
@@ -132,6 +142,7 @@ export abstract class AbstractRectSelectTool implements Tool {
 export abstract class AbstractDrawTool implements Tool {
 
 	readonly requiresLocalCoordinates = true;
+	readonly selectionPivotVisible = false;
 
 	private startX = 0;
 	private startY = 0;
@@ -168,6 +179,8 @@ export abstract class AbstractDrawTool implements Tool {
 	mouseUp(e: ToolMouseEvent): void {
 		this.processMouse(e, true);
 	}
+
+	mouseHover(e: ToolMouseEvent): void { }
 
 	protected abstract onStart(x: number, y: number): void;
 
@@ -216,6 +229,7 @@ export abstract class AbstractClickTool implements Tool {
 
 	readonly cursor = 'crosshair';
 	readonly requiresLocalCoordinates = true;
+	readonly selectionPivotVisible = false;
 
 	abstract cleanUp(): void;
 
@@ -228,4 +242,6 @@ export abstract class AbstractClickTool implements Tool {
 	mouseMove(e: ToolMouseEvent): void { }
 
 	mouseUp(e: ToolMouseEvent): void { }
+
+	mouseHover(e: ToolMouseEvent): void { }
 }

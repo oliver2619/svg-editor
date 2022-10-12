@@ -2,22 +2,12 @@ import { ShapeProperties, FillProperties, StrokeProperties } from './model-eleme
 import { LineCap, LineJoin } from './line-properties';
 
 export interface PathCmdProperties {
-	cmd: 'M' | 'H' | 'V' | 'L' | 'C' | 'S' | 'Q' | 'T' | 'Z';
+	cmd: 'M' | 'L' | 'C' | 'S' | 'Q' | 'T' | 'Z';
 }
 
 export interface PathCmdMoveProperties extends PathCmdProperties {
 	cmd: 'M';
 	x: number;
-	y: number;
-}
-
-export interface PathCmdHLineProperties extends PathCmdProperties {
-	cmd: 'H';
-	x: number;
-}
-
-export interface PathCmdVLineProperties extends PathCmdProperties {
-	cmd: 'V';
 	y: number;
 }
 

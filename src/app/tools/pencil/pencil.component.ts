@@ -8,11 +8,11 @@ import { Coordinate } from 'src/app/model/coordinate';
 import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
 import { GroupBuilder } from 'src/app/model/svg-builder/group-builder';
 import { PolylineBuilder } from 'src/app/model/svg-builder/polyline-builder';
-import { PathCmdMoveProperties, PathCmdContinueQuadCurveToProperties, PathCmdLineToProperties } from 'src/app/model/path-properties';
 
 export class PencilTool implements Tool {
 
 	readonly cursor = 'crosshair';
+	readonly selectionPivotVisible = false;
 	readonly requiresLocalCoordinates = true;
 
 	private readonly group: GroupBuilder;
@@ -75,6 +75,8 @@ export class PencilTool implements Tool {
 		}
 		this.path = undefined;
 	}
+
+	mouseHover(e: ToolMouseEvent): void { }
 
 	private getReducedPoints(points: Coordinate[], angleLimit: number, minSegmentSize: number): Coordinate[] {
 		const ret = [...points];

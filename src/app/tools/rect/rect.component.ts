@@ -41,6 +41,7 @@ export class RectTool extends AbstractDrawTool {
 				height: Math.abs(targetY - startY),
 				rx: this.propertiesComponent.rx,
 				ry: this.propertiesComponent.ry,
+				rotation: 0,
 				fill: this.propertiesComponent.shapePropertiesComponent.fillProperties,
 				stroke: this.propertiesComponent.shapePropertiesComponent.strokeProperties,
 				lineJoin: this.propertiesComponent.shapePropertiesComponent.lineJoin

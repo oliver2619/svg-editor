@@ -13,6 +13,8 @@ export interface SvgModel {
 
 	exportSvg(): string;
 
+	getAllTransformableShapes(): string[];
+
 	getGroups(id: string): string[];
 
 	getShapeById(id: string): ShapeModel;
@@ -33,7 +35,7 @@ export interface SvgModel {
 
 	getTopLevelShapeIds(): string[];
 
-	getTransformableShapes(shapeId: string): string[];
+	getTransformableShapes(shapeIds: string[]): string[];
 
 	hasShape(id: string): boolean;
 
@@ -70,6 +72,10 @@ export interface MutableSvgModel extends SvgModel {
 
 	addRect(id: string, properties: RectProperties, parent: string | undefined, zIndex: number | undefined): void;
 
+	flipShapeH(id: string, px: number): void;
+
+	flipShapeV(id: string, py: number): void;
+
 	moveShapeToGroup(shapeId: string, parent: string | undefined, zIndex: number | undefined): void;
 
 	moveShapeToZIndex(shapeId: string, zIndex: number): void;
@@ -83,6 +89,10 @@ export interface MutableSvgModel extends SvgModel {
 	removePattern(id: string): void;
 
 	removeShape(id: string): void;
+
+	rotateShape(id: string, deg: number, px: number, py: number): void;
+
+	scaleShape(id: string, sx: number, sy: number, px: number, py: number): void;
 
 	setShapeMnemento(id: string, m: any): void;
 

@@ -52,6 +52,10 @@ export class GroupModelImp extends ShapeModelImp implements GroupModel {
 
 	canMoveShapeForward(id: string): boolean { return this.container.canMoveShapeForward(id); }
 
+	flipH(px: number): void { }
+
+	flipV(py: number): void { }
+
 	override getGroups(): string[] { return [this.id, ...this.container.getTopLevelShapes().flatMap(s => s.getGroups())]; }
 
 	override getMnemento(): GroupProperties {
@@ -75,6 +79,10 @@ export class GroupModelImp extends ShapeModelImp implements GroupModel {
 	}
 
 	removeShape(id: string) { this.container.removeShape(id); }
+
+	rotate(deg: number, px: number, py: number) { }
+
+	scale(sx: number, sy: number, px: number, py: number): void { }
 
 	override setMnemento(m: GroupProperties) {
 		super.setMnemento(m);

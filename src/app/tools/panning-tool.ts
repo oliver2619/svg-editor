@@ -8,6 +8,7 @@ import { Coordinate } from '../model/coordinate';
 export class PanningTool implements Tool {
 
 	readonly cursor = 'grab';
+	readonly selectionPivotVisible = false;
 	readonly requiresLocalCoordinates = false;
 
 	private readonly startClick: Coordinate = new Coordinate(0, 0);
@@ -35,5 +36,7 @@ export class PanningTool implements Tool {
 	}
 
 	mouseUp(e: ToolMouseEvent): void { }
+
+	mouseHover(e: ToolMouseEvent): void { }
 }
 

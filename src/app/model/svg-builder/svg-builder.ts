@@ -13,15 +13,17 @@ import { ImageBuilder } from './image-builder';
 
 export class SvgBuilder implements ShapeContainerBuilder, SvgElementBuilder<SVGSVGElement> {
 
+	readonly element: SVGSVGElement;
 	readonly defs: DefsBuilder;
 
 	private readonly container: ShapeContainerBuilderImp;
 	private readonly svgElementBuilder: SvgElementBuilderImp;
 
-	constructor(readonly element: SVGSVGElement) {
-		this.container = new ShapeContainerBuilderImp(element);
-		this.svgElementBuilder = new SvgElementBuilderImp(element);
-		let defsElement = element.querySelector('defs');
+	constructor(element?: SVGSVGElement) {
+		this.element = element !== undefined ? element : document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		this.container = new ShapeContainerBuilderImp(this.element);
+		this.svgElementBuilder = new SvgElementBuilderImp(this.element);
+		let defsElement = this.element.querySelector('defs');
 		if (defsElement === null) {
 			defsElement = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
 			this.element.appendChild(defsElement);
@@ -99,7 +101,7 @@ export class SvgBuilder implements ShapeContainerBuilder, SvgElementBuilder<SVGS
 		this.element.setAttribute('height', String(height));
 		this.element.setAttribute('viewBox', `0 0 ${width} ${height}`);
 	}
-
+	
 	setTitle(title: string) {
 		let titleElement = this.element.querySelector('title') as SVGTitleElement | null;
 		if (title.length > 0) {
