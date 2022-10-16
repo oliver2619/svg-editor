@@ -4,8 +4,9 @@ import { NoColor } from "../color/no-color";
 import { SingleColor } from "../color/single-color";
 import { Coordinate } from "../coordinate";
 import { LineCap, LineJoin, LinePattern } from "../line-properties";
-import { FillProperties, ShapeProperties, StrokeProperties } from "../model-element-properties";
-import { PathCmdBezierCurveToProperties, PathCmdCloseProperties, PathCmdContinueBezierCurveToProperties, PathCmdContinueQuadCurveToProperties, PathCmdLineToProperties, PathCmdMoveProperties, PathCmdProperties, PathCmdQuadCurveToProperties } from "../path-properties";
+import { FillProperties, ShapeProperties, StrokeProperties } from "../properties/model-element-properties";
+import { PathCmdBezierCurveToProperties, PathCmdCloseProperties, PathCmdContinueBezierCurveToProperties, PathCmdContinueQuadCurveToProperties, PathCmdLineToProperties, PathCmdMoveProperties, PathCmdProperties, PathCmdQuadCurveToProperties } from "../properties/path-properties";
+import { PathPropertiesBuilder } from "../properties/path-properties-builder";
 import { VectorEffect } from "../vector-effect";
 import { ColorNameMapper } from "./color-name-mapper";
 import { ImportBuilder, ImportContainerBuilder, ImportContentBuilder } from "./import-builder";
@@ -142,7 +143,8 @@ export class SvgImporter {
 		const opacity = e.getAttribute('stroke-opacity');
 		const ret: StrokeProperties = {
 			color: this.importColor(color !== null ? color : undefined, opacity !== null ? opacity : undefined),
-			linePattern: LinePattern.importFromSvg(e)
+			linePattern: LinePattern.importFromSvg(e),
+			lineCap: this.importLineCap(e)
 		};
 		return ret;
 	}
@@ -177,11 +179,11 @@ export class SvgImporter {
 
 	private importRotation(e: SVGElement, px: number, py: number): number {
 		const transform = e.getAttribute('transform');
-		if(transform === null) {
+		if (transform === null) {
 			return 0;
 		}
 		const result = /^\s*rotate\(\s*(-?\d*\.?\d*)\s+(-?\d*\.?\d*)\s+(-?\d*\.?\d*)\s*\)\s*$/.exec(transform);
-		if(result === null) {
+		if (result === null) {
 			throw new Error(`Unable to import transformation '${transform}'.`);
 		}
 		const rad = Number(result[1]);
@@ -229,7 +231,6 @@ export class SvgImporter {
 			...this.importShapeProperties(e),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
-			lineCap: this.importLineCap(e),
 			lineJoin: this.importLineJoin(e)
 		});
 		this.importChildElements(e, group);
@@ -278,8 +279,7 @@ export class SvgImporter {
 			y1: e.y1.baseVal.value,
 			x2: e.x2.baseVal.value,
 			y2: e.y2.baseVal.value,
-			stroke: this.importStrokeProperties(e),
-			lineCap: this.importLineCap(e)
+			stroke: this.importStrokeProperties(e)
 		});
 	}
 
@@ -439,7 +439,6 @@ export class SvgImporter {
 			commands: this.importPathElements(e),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
-			lineCap: this.importLineCap(e),
 			lineJoin: this.importLineJoin(e)
 		});
 	}
@@ -449,12 +448,20 @@ export class SvgImporter {
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		containerBuilder.polygon(id, {
+		const builder = new PathPropertiesBuilder();
+		Array.from(e.points).forEach((p, i) => {
+			if (i === 0) {
+				builder.moveTo(p.x, p.y);
+			} else {
+				builder.lineTo(p.x, p.y);
+			}
+		});
+		containerBuilder.path(id, {
 			...this.importShapeProperties(e),
-			points: Array.from(e.points).map(it => new Coordinate(it.x, it.y)),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
-			lineJoin: this.importLineJoin(e)
+			lineJoin: this.importLineJoin(e),
+			commands: builder.close().getCommands()
 		});
 	}
 
@@ -463,13 +470,20 @@ export class SvgImporter {
 		if (e.id !== '') {
 			this.idByImports.set(e.id, id);
 		}
-		containerBuilder.polyline(id, {
+		const builder = new PathPropertiesBuilder();
+		Array.from(e.points).forEach((p, i) => {
+			if (i === 0) {
+				builder.moveTo(p.x, p.y);
+			} else {
+				builder.lineTo(p.x, p.y);
+			}
+		});
+		containerBuilder.path(id, {
 			...this.importShapeProperties(e),
-			points: Array.from(e.points).map(it => new Coordinate(it.x, it.y)),
 			fill: this.importFillProperties(e),
 			stroke: this.importStrokeProperties(e),
-			lineCap: this.importLineCap(e),
-			lineJoin: this.importLineJoin(e)
+			lineJoin: this.importLineJoin(e),
+			commands: builder.close().getCommands()
 		});
 	}
 

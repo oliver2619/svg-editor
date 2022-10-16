@@ -8,6 +8,11 @@ import { Coordinate } from 'src/app/model/coordinate';
 import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
 import { GroupBuilder } from 'src/app/model/svg-builder/group-builder';
 import { PolylineBuilder } from 'src/app/model/svg-builder/polyline-builder';
+import { ShapePropertiesComponentInterface } from 'src/app/shape-properties/shape-properties-component-interface';
+import { FillProperties, ShapeProperties, StrokeProperties } from 'src/app/model/properties/model-element-properties';
+import { LineCap, LineJoin } from 'src/app/model/line-properties';
+import { PathCmdProperties } from 'src/app/model/properties/path-properties';
+import { PathPropertiesBuilder } from 'src/app/model/properties/path-properties-builder';
 
 export class PencilTool implements Tool {
 
@@ -43,8 +48,12 @@ export class PencilTool implements Tool {
 
 	mouseDown(e: ToolMouseEvent): boolean {
 		this.polyline = this.group.polyline();
-		this.polyline.setFillColor('none');
-		this.polyline.setStrokeColor('black');
+		if (this.propertiesComponent !== undefined) {
+			this.polyline.setFillProperties(this.propertiesComponent.fillProperties);
+			this.polyline.setStrokeProperties(this.propertiesComponent.strokeProperties);
+			this.polyline.setShapeProperties(this.propertiesComponent.shapeProperties);
+			this.polyline.setLineJoin(this.propertiesComponent.lineJoin);
+		}
 		this.path = [];
 		this.path.push(new Coordinate(e.x, e.y));
 		this.polyline.addPoint(e.x, e.y);
@@ -64,13 +73,20 @@ export class PencilTool implements Tool {
 		this.cleanUp();
 		if (this.path !== undefined && this.propertiesComponent !== undefined && this.propertiesComponent.shapeProperties !== undefined) {
 			const points = this.getReducedPoints(this.path, this.propertiesComponent.value.angleLimit * Math.PI / 180, this.propertiesComponent.value.minSegmentSize);
-			this.viewService.addPolyline({
-				...this.propertiesComponent.shapeProperties.shapeProperties,
-				fill: this.propertiesComponent.shapeProperties.fillProperties,
-				lineCap: this.propertiesComponent.shapeProperties.lineCap,
-				lineJoin: this.propertiesComponent.shapeProperties.lineJoin,
-				stroke: this.propertiesComponent.shapeProperties.strokeProperties,
-				points: points
+			const builder = new PathPropertiesBuilder();
+			points.forEach((p, i) => {
+				if (i === 0) {
+					builder.moveTo(p.x, p.y);
+				} else {
+					builder.lineTo(p.x, p.y);
+				}
+			});
+			this.viewService.addPath({
+				...this.propertiesComponent.shapeProperties,
+				fill: this.propertiesComponent.fillProperties,
+				lineJoin: this.propertiesComponent.lineJoin,
+				stroke: this.propertiesComponent.strokeProperties,
+				commands: builder.getCommands()
 			});
 		}
 		this.path = undefined;
@@ -125,12 +141,20 @@ interface PencilComponentValue {
 	styleUrls: ['./pencil.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PencilComponent {
+export class PencilComponent implements ShapePropertiesComponentInterface {
 
 	@ViewChild('shapeProperties')
-	shapeProperties: ShapePropertiesComponent | undefined;
+	shapePropertiesComponent: ShapePropertiesComponent | undefined;
 
 	readonly formGroup: FormGroup;
+
+	get fillProperties(): FillProperties { return this.shapePropertiesComponent!.fillProperties; }
+
+	get shapeProperties(): ShapeProperties { return this.shapePropertiesComponent!.shapeProperties; }
+
+	get strokeProperties(): StrokeProperties { return this.shapePropertiesComponent!.strokeProperties; }
+
+	get lineJoin(): LineJoin { return this.shapePropertiesComponent!.lineJoin; }
 
 	get value(): PencilComponentValue {
 		return this.formGroup.value;

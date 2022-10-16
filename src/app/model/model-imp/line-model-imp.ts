@@ -2,12 +2,19 @@ import { ShapeModelImp } from './shape-model-imp';
 import { StrokeModelImp } from './stroke-model-imp';
 import { LineCap } from '../line-properties';
 import { ShapeContainerBuilder } from '../svg-builder/shape-container-builder';
-import { LineProperties } from '../model-element-properties';
+import { LineProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
 import { ShapeModelType } from '../shape-model';
 import { Coordinate } from '../coordinate';
+import { PathProperties } from '../properties/path-properties';
+import { PathPropertiesBuilder } from '../properties/path-properties-builder';
+import { NoColor } from '../color/no-color';
+import { ComponentRef, ViewContainerRef } from '@angular/core';
+import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
+import { MutableSvgModel } from '../svg-model';
 
 export class LineModelImp extends ShapeModelImp {
 
+	readonly canConvertToPath = true;
 	readonly type = ShapeModelType.LINE;
 
 	private x1: number;
@@ -15,7 +22,6 @@ export class LineModelImp extends ShapeModelImp {
 	private x2: number;
 	private y2: number;
 	private stroke: StrokeModelImp;
-	private lineCap: LineCap;
 
 	constructor(id: string, parentId: string | undefined, properties: LineProperties) {
 		super(id, parentId, properties);
@@ -24,14 +30,34 @@ export class LineModelImp extends ShapeModelImp {
 		this.x2 = properties.x2;
 		this.y2 = properties.y2;
 		this.stroke = new StrokeModelImp(properties.stroke);
-		this.lineCap = properties.lineCap;
 	}
 
 	buildSvg(builder: ShapeContainerBuilder): void {
 		const line = builder.line(this.x1, this.y1, this.x2, this.y2);
 		this.buildShapeAttributes(line);
 		this.stroke.buildAttributes(line);
-		line.setLineCap(this.lineCap);
+	}
+
+	createPropertiesComponent(container: ViewContainerRef, model: MutableSvgModel): ComponentRef<any> {
+		const ret = container.createComponent(ShapePropertiesComponent);
+		ret.setInput('fill', false);
+		ret.setInput('line-join', false);
+		ret.instance.strokeProperties = this.stroke.getMnemento();
+		ret.instance.shapeProperties = this.getMnemento();
+		ret.instance.onStrokeChange.subscribe({
+			next: (stroke: StrokeProperties) => {
+				const p = this.getMnemento();
+				p.stroke = stroke;
+				model.setShapeMnemento(this.id, p);
+			}
+		});
+		ret.instance.onShapeChange.subscribe({
+			next: (shape: ShapeProperties) => {
+				const p = { ...this.getMnemento(), ...shape };
+				model.setShapeMnemento(this.id, p);
+			}
+		});
+		return ret;
 	}
 
 	flipH(px: number): void {
@@ -56,6 +82,18 @@ export class LineModelImp extends ShapeModelImp {
 		this.y2 = p2.y;
 	}
 
+	getConvertToPathProperties(): PathProperties {
+		const commands = new PathPropertiesBuilder().moveTo(this.x1, this.y1).lineTo(this.x2, this.y2).getCommands();
+		const ret: PathProperties = {
+			...super.getMnemento(),
+			fill: { color: NoColor.INSTANCE },
+			stroke: this.stroke.getMnemento(),
+			lineJoin: 'arcs',
+			commands
+		};
+		return ret;
+	}
+
 	override getMnemento(): LineProperties {
 		return {
 			...super.getMnemento(),
@@ -63,8 +101,7 @@ export class LineModelImp extends ShapeModelImp {
 			y1: this.y1,
 			x2: this.x2,
 			y2: this.y2,
-			stroke: this.stroke.getMnemento(),
-			lineCap: this.lineCap
+			stroke: this.stroke.getMnemento()
 		};
 	}
 
@@ -97,7 +134,6 @@ export class LineModelImp extends ShapeModelImp {
 		this.x2 = m.x2;
 		this.y2 = m.y2;
 		this.stroke = new StrokeModelImp(m.stroke);
-		this.lineCap = m.lineCap;
 	}
 
 	translate(dx: number, dy: number) {

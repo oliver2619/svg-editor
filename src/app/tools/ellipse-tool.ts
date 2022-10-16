@@ -4,12 +4,13 @@ import { EllipseBuilder } from '../model/svg-builder/ellipse-builder';
 import { ShapePropertiesComponent } from '../shape-properties/shape-properties.component';
 import { ViewService } from '../view/view.service';
 import { ViewContainerRef, ComponentRef } from '@angular/core';
+import { ShapePropertiesComponentInterface } from '../shape-properties/shape-properties-component-interface';
 
 export class EllipseTool extends AbstractDrawTool {
 
 	private readonly group: GroupBuilder;
 	private ellipse: EllipseBuilder | undefined;
-	private propertiesComponent: ShapePropertiesComponent | undefined;
+	private propertiesComponent: ShapePropertiesComponentInterface | undefined;
 
 	constructor(viewService: ViewService) {
 		super(viewService);
@@ -26,7 +27,6 @@ export class EllipseTool extends AbstractDrawTool {
 	createPropertiesComponent(container: ViewContainerRef): ComponentRef<any> | undefined {
 		const ret = container.createComponent(ShapePropertiesComponent);
 		ret.setInput('global', true);
-		ret.setInput('line-cap', false);
 		ret.setInput('line-join', false);
 		this.propertiesComponent = ret.instance;
 		return ret;
@@ -56,7 +56,10 @@ export class EllipseTool extends AbstractDrawTool {
 
 	protected onStart(x: number, y: number): void {
 		this.ellipse = this.group.ellipse(x, y, 0, 0);
-		this.ellipse.setStrokeColor('black');
-		this.ellipse.setFillColor('none');
+		if (this.propertiesComponent !== undefined) {
+			this.ellipse.setFillProperties(this.propertiesComponent.fillProperties);
+			this.ellipse.setStrokeProperties(this.propertiesComponent.strokeProperties);
+			this.ellipse.setShapeProperties(this.propertiesComponent.shapeProperties);
+		}
 	}
 }

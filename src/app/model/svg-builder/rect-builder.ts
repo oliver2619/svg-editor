@@ -1,11 +1,13 @@
 import { SvgElementBuilderImp } from './svg-element-builder';
 import { FilledElementBuilder, FilledElementBuilderImp } from './filled-element-builder';
 import { StrokedElementBuilder, StrokedElementBuilderImp } from './stroked-element-builder';
-import { ShapeBuilder, ShapeBuilderImp } from './shape-builder';
+import { ShapeBuilderImp } from './shape-builder';
 import { VectorEffect } from '../vector-effect';
 import { LineCap, LineJoin } from '../line-properties';
+import { BoxBuilder } from './box-builder';
+import { FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
 
-export class RectBuilder implements ShapeBuilder<SVGRectElement>, StrokedElementBuilder, FilledElementBuilder {
+export class RectBuilder implements BoxBuilder<SVGRectElement>, StrokedElementBuilder, FilledElementBuilder {
 
 	private readonly svg: SvgElementBuilderImp;
 	private readonly shape: ShapeBuilderImp;
@@ -17,6 +19,18 @@ export class RectBuilder implements ShapeBuilder<SVGRectElement>, StrokedElement
 		this.shape = new ShapeBuilderImp(element);
 		this.fill = new FilledElementBuilderImp(element);
 		this.stroke = new StrokedElementBuilderImp(element);
+	}
+
+	setShapeProperties(properties: ShapeProperties): void {
+		this.shape.setShapeProperties(properties);
+	}
+
+	setFillProperties(properties: FillProperties): void {
+		this.fill.setFillProperties(properties);
+	}
+
+	setStrokeProperties(properties: StrokeProperties): void {
+		this.stroke.setStrokeProperties(properties);
 	}
 
 	setRotation(deg: number, px: number, py: number) {

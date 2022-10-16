@@ -1,12 +1,16 @@
 import { VectorEffect } from '../vector-effect';
 import { ShapeContainerBuilder } from '../svg-builder/shape-container-builder';
 import { ShapeBuilder } from '../svg-builder/shape-builder';
-import { ShapeProperties } from '../model-element-properties';
+import { ShapeProperties } from '../properties/model-element-properties';
 import { ShapeModel, ShapeModelType } from '../shape-model';
+import { PathProperties } from '../properties/path-properties';
+import { ViewContainerRef, ComponentRef } from '@angular/core';
+import { MutableSvgModel } from '../svg-model';
 
 export abstract class ShapeModelImp implements ShapeModel {
 
 	abstract readonly type: ShapeModelType;
+	abstract readonly canConvertToPath: boolean;
 
 	private _opacity: number;
 	private _vectorEffect: VectorEffect;
@@ -22,9 +26,13 @@ export abstract class ShapeModelImp implements ShapeModel {
 
 	abstract buildSvg(builder: ShapeContainerBuilder): void;
 
+	abstract createPropertiesComponent(container: ViewContainerRef, model: MutableSvgModel): ComponentRef<any>;
+
 	abstract flipH(px: number): void;
 
 	abstract flipV(py: number): void;
+
+	abstract getConvertToPathProperties(): PathProperties;
 
 	getGroups(): string[] { return []; }
 

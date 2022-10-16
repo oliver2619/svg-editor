@@ -6,8 +6,11 @@ import { ViewService } from 'src/app/view/view.service';
 import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
 import { GroupBuilder } from 'src/app/model/svg-builder/group-builder';
 import { PathBuilder } from 'src/app/model/svg-builder/path-builder';
-import { PathCmdProperties, PathCmdMoveProperties, PathCmdLineToProperties, PathCmdCloseProperties, PathCmdContinueQuadCurveToProperties } from 'src/app/model/path-properties';
+import { PathCmdProperties, PathCmdMoveProperties, PathCmdLineToProperties, PathCmdCloseProperties, PathCmdContinueQuadCurveToProperties } from 'src/app/model/properties/path-properties';
 import { Coordinate } from 'src/app/model/coordinate';
+import { ShapePropertiesComponentInterface } from 'src/app/shape-properties/shape-properties-component-interface';
+import { FillProperties, ShapeProperties, StrokeProperties } from 'src/app/model/properties/model-element-properties';
+import { LineJoin } from 'src/app/model/line-properties';
 
 export class PathTool implements Tool {
 
@@ -66,8 +69,12 @@ export class PathTool implements Tool {
 		const py = this.viewService.snapToGrid ? Math.round(e.y / gs) * gs : e.y;
 		if (this.pathBuilder === undefined) {
 			this.pathBuilder = this.group.path();
-			this.pathBuilder.setFillColor('none');
-			this.pathBuilder.setStrokeColor('black');
+			if (this.propertiesComponent !== undefined) {
+				this.pathBuilder.setShapeProperties(this.propertiesComponent.shapeProperties);
+				this.pathBuilder.setFillProperties(this.propertiesComponent.fillProperties);
+				this.pathBuilder.setStrokeProperties(this.propertiesComponent.strokeProperties);
+				this.pathBuilder.setLineJoin(this.propertiesComponent.lineJoin);
+			}
 		}
 		if (this.path === undefined || this.path.length === 0) {
 			this.pathBuilder.path.moveTo(px, py);
@@ -98,12 +105,15 @@ export class PathTool implements Tool {
 	mouseHover(e: ToolMouseEvent): void {
 		this.hoverCoordinate.x = e.x;
 		this.hoverCoordinate.y = e.y;
-		if(this.path !== undefined && this.path.length > 0) {
+		if (this.path !== undefined && this.path.length > 0) {
 			this.recreatePath();
 		}
 	}
 
 	private close() {
+		if (this.path === undefined || this.path.length === 0 || this.path[this.path.length - 1].cmd === 'M') {
+			return;
+		}
 		if (this.pathBuilder !== undefined) {
 			this.pathBuilder.path.closePath();
 			const cmd: PathCmdCloseProperties = { cmd: 'Z' };
@@ -113,15 +123,19 @@ export class PathTool implements Tool {
 
 	private finish() {
 		this.cleanUp();
-		if (this.path !== undefined && this.propertiesComponent !== undefined && this.propertiesComponent.shapeProperties !== undefined) {
-			this.viewService.addPath({
-				...this.propertiesComponent.shapeProperties.shapeProperties,
-				fill: this.propertiesComponent.shapeProperties.fillProperties,
-				stroke: this.propertiesComponent.shapeProperties.strokeProperties,
-				lineCap: this.propertiesComponent.shapeProperties.lineCap,
-				lineJoin: this.propertiesComponent.shapeProperties.lineJoin,
-				commands: this.path
-			});
+		if (this.path !== undefined && this.path.length > 0 && this.propertiesComponent !== undefined && this.propertiesComponent.shapeProperties !== undefined) {
+			while (this.path.length > 0 && this.path[this.path.length - 1].cmd === 'M') {
+				this.path.splice(this.path.length - 1, 1);
+			}
+			if (this.path.length > 0) {
+				this.viewService.addPath({
+					...this.propertiesComponent.shapeProperties,
+					fill: this.propertiesComponent.fillProperties,
+					stroke: this.propertiesComponent.strokeProperties,
+					lineJoin: this.propertiesComponent.lineJoin,
+					commands: this.path
+				});
+			}
 			this.path = undefined;
 		}
 	}
@@ -148,13 +162,21 @@ export class PathTool implements Tool {
 	styleUrls: ['./path.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PathComponent {
+export class PathComponent implements ShapePropertiesComponentInterface {
 
 	@ViewChild('shapeProperties')
-	shapeProperties: ShapePropertiesComponent | undefined;
+	shapePropertiesComponent: ShapePropertiesComponent | undefined;
 
 	readonly onFinish = new EventEmitter<boolean>();
 	readonly onUndo = new EventEmitter<void>();
+
+	get fillProperties(): FillProperties { return this.shapePropertiesComponent!.fillProperties; }
+
+	get lineJoin(): LineJoin { return this.shapePropertiesComponent!.lineJoin; }
+
+	get shapeProperties(): ShapeProperties { return this.shapePropertiesComponent!.shapeProperties; }
+
+	get strokeProperties(): StrokeProperties { return this.shapePropertiesComponent!.strokeProperties; }
 
 	constructor() { }
 

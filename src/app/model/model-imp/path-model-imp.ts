@@ -1,39 +1,103 @@
 import { ShapeModelImp } from './shape-model-imp';
 import { FillModelImp } from './fill-model-imp';
 import { StrokeModelImp } from './stroke-model-imp';
-import { LineJoin, LineCap } from '../line-properties';
+import { LineJoin } from '../line-properties';
 import { ShapeContainerBuilder } from '../svg-builder/shape-container-builder';
 import { PathCmdModelImp } from './path-cmd-model-imp';
-import { PathProperties } from '../path-properties';
+import { PathProperties } from '../properties/path-properties';
 import { ShapeModelType } from '../shape-model';
+import { ViewContainerRef, ComponentRef } from '@angular/core';
+import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
+import { MutableSvgModel } from '../svg-model';
+import { FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
 
 export class PathModelImp extends ShapeModelImp {
 
+	readonly canConvertToPath = true;
 	readonly type = ShapeModelType.PATH;
 
 	private path: PathCmdModelImp[];
 	private fill: FillModelImp;
 	private stroke: StrokeModelImp;
 	private lineJoin: LineJoin;
-	private lineCap: LineCap;
+
+	get isClosed(): boolean { return this.path.some(p => p.isClosed); }
+
+	get isLinear(): boolean { return this.path.every(p => p.isLinear); }
+
+	get numberOfSubPaths(): number { return this.path.filter(p => p.isNewSubPath).length; }
 
 	constructor(id: string, parentId: string | undefined, properties: PathProperties) {
 		super(id, parentId, properties);
 		this.fill = new FillModelImp(properties.fill);
 		this.stroke = new StrokeModelImp(properties.stroke);
-		this.lineCap = properties.lineCap;
 		this.lineJoin = properties.lineJoin;
 		this.path = properties.commands.map(c => PathCmdModelImp.create(c));
 	}
 
 	buildSvg(builder: ShapeContainerBuilder): void {
-		const path = builder.path();
-		this.buildShapeAttributes(path);
-		this.fill.buildAttributes(path);
-		this.stroke.buildAttributes(path);
-		path.setLineCap(this.lineCap);
-		path.setLineJoin(this.lineJoin);
-		this.path.forEach(p => p.buildPathElement(path.path));
+		if (this.isLinear && this.numberOfSubPaths === 1) {
+			if (this.isClosed) {
+				const polygon = builder.polygon();
+				this.buildShapeAttributes(polygon);
+				this.fill.buildAttributes(polygon);
+				this.stroke.buildAttributes(polygon);
+				polygon.setLineJoin(this.lineJoin);
+				this.path.forEach(p => p.buildVertexList(polygon));
+			} else {
+				const polyline = builder.polyline();
+				this.buildShapeAttributes(polyline);
+				this.fill.buildAttributes(polyline);
+				this.stroke.buildAttributes(polyline);
+				polyline.setLineJoin(this.lineJoin);
+				this.path.forEach(p => p.buildVertexList(polyline));
+			}
+		} else {
+			const path = builder.path();
+			this.buildShapeAttributes(path);
+			this.fill.buildAttributes(path);
+			this.stroke.buildAttributes(path);
+			path.setLineJoin(this.lineJoin);
+			this.path.forEach(p => p.buildPathElement(path.path));
+		}
+	}
+
+	createPropertiesComponent(container: ViewContainerRef, model: MutableSvgModel): ComponentRef<any> {
+		const ret = container.createComponent(ShapePropertiesComponent);
+		ret.setInput('fill', true);
+		ret.setInput('line-join', true);
+		ret.instance.fillProperties = this.fill.getMnemento();
+		ret.instance.strokeProperties = this.stroke.getMnemento();
+		ret.instance.shapeProperties = this.getMnemento();
+		ret.instance.lineJoin = this.getMnemento().lineJoin;
+		ret.instance.onFillChange.subscribe({
+			next: (fill: FillProperties) => {
+				const p = this.getMnemento();
+				p.fill = fill;
+				model.setShapeMnemento(this.id, p);
+			}
+		});
+		ret.instance.onStrokeChange.subscribe({
+			next: (stroke: StrokeProperties) => {
+				const p = this.getMnemento();
+				p.stroke = stroke;
+				model.setShapeMnemento(this.id, p);
+			}
+		});
+		ret.instance.onShapeChange.subscribe({
+			next: (shape: ShapeProperties) => {
+				const p = { ...this.getMnemento(), ...shape };
+				model.setShapeMnemento(this.id, p);
+			}
+		});
+		ret.instance.onLineJoinChange.subscribe({
+			next: (lineJoin: LineJoin) => {
+				const p = this.getMnemento();
+				p.lineJoin = lineJoin;
+				model.setShapeMnemento(this.id, p);
+			}
+		});
+		return ret;
 	}
 
 	flipH(px: number): void {
@@ -44,13 +108,16 @@ export class PathModelImp extends ShapeModelImp {
 		this.path.forEach(p => p.flipV(py));
 	}
 
+	getConvertToPathProperties(): PathProperties {
+		return this.getMnemento();
+	}
+
 	override getMnemento(): PathProperties {
 		return {
 			...super.getMnemento(),
 			fill: this.fill.getMnemento(),
 			stroke: this.stroke.getMnemento(),
 			lineJoin: this.lineJoin,
-			lineCap: this.lineCap,
 			commands: this.path.map(p => p.getMnemento())
 		};
 	}
@@ -67,7 +134,6 @@ export class PathModelImp extends ShapeModelImp {
 		super.setMnemento(m);
 		this.fill = new FillModelImp(m.fill);
 		this.stroke = new StrokeModelImp(m.stroke);
-		this.lineCap = m.lineCap;
 		this.lineJoin = m.lineJoin;
 		this.path = m.commands.map(c => PathCmdModelImp.create(c));
 	}

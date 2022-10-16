@@ -1,8 +1,10 @@
-import { ShapeBuilder, ShapeBuilderImp } from './shape-builder';
+import { ShapeBuilderImp } from './shape-builder';
 import { VectorEffect } from '../vector-effect';
 import { SvgElementBuilderImp } from './svg-element-builder';
+import { BoxBuilder } from './box-builder';
+import { ShapeProperties } from '../properties/model-element-properties';
 
-export class ImageBuilder implements ShapeBuilder<SVGImageElement> {
+export class ImageBuilder implements BoxBuilder<SVGImageElement> {
 
 	private readonly svg: SvgElementBuilderImp;
 	private readonly shape: ShapeBuilderImp;
@@ -10,6 +12,10 @@ export class ImageBuilder implements ShapeBuilder<SVGImageElement> {
 	constructor(readonly element: SVGImageElement) {
 		this.svg = new SvgElementBuilderImp(element);
 		this.shape = new ShapeBuilderImp(element);
+	}
+
+	setShapeProperties(properties: ShapeProperties): void {
+		this.shape.setShapeProperties(properties);
 	}
 
 	setUrl(url: string) {

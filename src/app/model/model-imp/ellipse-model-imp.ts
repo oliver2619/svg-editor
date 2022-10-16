@@ -2,12 +2,18 @@ import { ShapeModelImp } from './shape-model-imp';
 import { FillModelImp } from './fill-model-imp';
 import { StrokeModelImp } from './stroke-model-imp';
 import { ShapeContainerBuilder } from '../svg-builder/shape-container-builder';
-import { EllipseProperties } from '../model-element-properties';
+import { EllipseProperties, FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
 import { ShapeModelType } from '../shape-model';
 import { Coordinate } from '../coordinate';
+import { PathProperties } from '../properties/path-properties';
+import { PathPropertiesBuilder } from '../properties/path-properties-builder';
+import { ComponentRef, ViewContainerRef } from '@angular/core';
+import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
+import { MutableSvgModel } from '../svg-model';
 
 export class EllipseModelImp extends ShapeModelImp {
 
+	readonly canConvertToPath = true;
 	readonly type = ShapeModelType.ELLIPSE;
 
 	private cx: number;
@@ -37,6 +43,36 @@ export class EllipseModelImp extends ShapeModelImp {
 		this.stroke.buildAttributes(ellipse);
 	}
 
+	createPropertiesComponent(container: ViewContainerRef, model: MutableSvgModel): ComponentRef<any> {
+		const ret = container.createComponent(ShapePropertiesComponent);
+		ret.setInput('fill', true);
+		ret.setInput('line-join', false);
+		ret.instance.fillProperties = this.fill.getMnemento();
+		ret.instance.strokeProperties = this.stroke.getMnemento();
+		ret.instance.shapeProperties = this.getMnemento();
+		ret.instance.onFillChange.subscribe({
+			next: (fill: FillProperties) => {
+				const p = this.getMnemento();
+				p.fill = fill;
+				model.setShapeMnemento(this.id, p);
+			}
+		});
+		ret.instance.onStrokeChange.subscribe({
+			next: (stroke: StrokeProperties) => {
+				const p = this.getMnemento();
+				p.stroke = stroke;
+				model.setShapeMnemento(this.id, p);
+			}
+		});
+		ret.instance.onShapeChange.subscribe({
+			next: (shape: ShapeProperties) => {
+				const p = { ...this.getMnemento(), ...shape };
+				model.setShapeMnemento(this.id, p);
+			}
+		});
+		return ret;
+	}
+
 	flipH(px: number): void {
 		const c = new Coordinate(this.cx, this.cy);
 		c.flipH(px);
@@ -52,7 +88,33 @@ export class EllipseModelImp extends ShapeModelImp {
 		this.cy = c.y;
 		this.rotation = -this.rotation;
 	}
-	
+
+	getConvertToPathProperties(): PathProperties {
+		const a = this.rotation * Math.PI / 180;
+		const cs = Math.cos(a);
+		const sn = Math.sin(a);
+		const ux = this.rx * cs;
+		const uy = this.rx * sn;
+		const vy = this.ry * cs;
+		const vx = -this.ry * sn;
+		const commands = new PathPropertiesBuilder()
+			.moveTo(this.cx + ux, this.cy + uy)
+			.quadraticCurveTo(this.cx + ux - vx, this.cy + uy - vy, this.cx - vx, this.cy - vy)
+			.continueQuadraticCurveTo(this.cx - ux, this.cy - uy)
+			.continueQuadraticCurveTo(this.cx + vx, this.cy + vy)
+			.continueQuadraticCurveTo(this.cx + ux, this.cy + uy)
+			.close()
+			.getCommands();
+		const ret: PathProperties = {
+			...super.getMnemento(),
+			fill: this.fill.getMnemento(),
+			stroke: this.stroke.getMnemento(),
+			lineJoin: 'arcs',
+			commands
+		};
+		return ret;
+	}
+
 	override getMnemento(): EllipseProperties {
 		return {
 			...super.getMnemento(),

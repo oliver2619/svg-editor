@@ -4,6 +4,7 @@ import { StrokedElementBuilder, StrokedElementBuilderImp } from './stroked-eleme
 import { ShapeBuilder, ShapeBuilderImp } from './shape-builder';
 import { VectorEffect } from '../vector-effect';
 import { LineCap, LineJoin } from '../line-properties';
+import { FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
 
 export class CircleBuilder implements ShapeBuilder<SVGCircleElement>, StrokedElementBuilder, FilledElementBuilder {
 
@@ -17,6 +18,18 @@ export class CircleBuilder implements ShapeBuilder<SVGCircleElement>, StrokedEle
 		this.shape = new ShapeBuilderImp(element);
 		this.fill = new FilledElementBuilderImp(element);
 		this.stroke = new StrokedElementBuilderImp(element);
+	}
+
+	setShapeProperties(properties: ShapeProperties): void {
+		this.shape.setShapeProperties(properties);
+	}
+
+	setFillProperties(properties: FillProperties): void {
+		this.fill.setFillProperties(properties);
+	}
+
+	setStrokeProperties(properties: StrokeProperties): void {
+		this.stroke.setStrokeProperties(properties);
 	}
 
 	setCircle(cx: number, cy: number, r: number) {
@@ -36,7 +49,7 @@ export class CircleBuilder implements ShapeBuilder<SVGCircleElement>, StrokedEle
 	setId(id: string) {
 		this.svg.setId(id);
 	}
-	
+
 	setFillOpacity(opacity: number): void {
 		this.fill.setFillOpacity(opacity);
 	}

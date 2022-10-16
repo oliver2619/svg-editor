@@ -6,11 +6,11 @@ import { ToolMouseEvent } from '../tools/tool-mouse-event';
 import { SettingsService } from '../settings/settings.service';
 import { SvgModel } from '../model/svg-model';
 import { SvgBuilder } from '../model/svg-builder/svg-builder';
-import { EllipseProperties, LineProperties, RectProperties, PolylineProperties, PolygonProperties, CircleProperties, ImageProperties } from '../model/model-element-properties';
+import { EllipseProperties, LineProperties, RectProperties, CircleProperties, ImageProperties } from '../model/properties/model-element-properties';
 import { SelectionLayer } from './selection-layer';
 import { Coordinate } from '../model/coordinate';
-import { PathProperties } from '../model/path-properties';
-import { GroupModel } from '../model/shape-model';
+import { PathProperties } from '../model/properties/path-properties';
+import { GroupModel, ShapeModel } from '../model/shape-model';
 
 export enum ViewSelectMode {
 	REPLACE, ADD, REMOVE
@@ -58,7 +58,7 @@ export class ViewService implements View {
 	}
 
 	get canConvertToPath(): boolean {
-		return false;
+		return this._selectedIds.length > 0 && this._selectedIds.every(id => this.modelService.getShapeById(id).canConvertToPath);
 	}
 
 	get canMoveSelectionBackward(): boolean {
@@ -190,20 +190,9 @@ export class ViewService implements View {
 		this.modelService.addPath(this.modelService.nextId, properties, undefined, undefined);
 	}
 
-	addPolyline(properties: PolylineProperties) {
-		this.modelService.addPolyline(this.modelService.nextId, properties, undefined, undefined);
-	}
+	clearSelection() { this.setSelection([]); }
 
-	addPolygon(properties: PolygonProperties) {
-		this.modelService.addPolygon(this.modelService.nextId, properties, undefined, undefined);
-	}
-
-	clearSelection() {
-		this.setSelection([]);
-	}
-
-	convertToPath() {
-	}
+	convertToPath() { this.modelService.convertAllToPath([...this._selectedIds]); }
 
 	flipSelectedH() {
 		const bb = this.getSelectionBoundingBox();
@@ -270,6 +259,8 @@ export class ViewService implements View {
 			}, undefined);
 	}
 
+	getSelectedShapes(): ShapeModel[] { return this._selectedIds.map(id => this.modelService.getShapeById(id)); }
+
 	getSelectedTransformableIds(): string[] { return this.modelService.getTransformableShapes(this._selectedIds); }
 
 	groupSelected() {
@@ -285,13 +276,13 @@ export class ViewService implements View {
 		throw new Error('Not implemented yet');
 	}
 
-	mouseEventToToolMouseEvent(ev: PointerEvent): ToolMouseEvent {
+	mouseEventToToolMouseEvent(ev: PointerEvent, x: number, y: number): ToolMouseEvent {
 		return {
 			altKey: ev.altKey,
 			ctrlKey: ev.ctrlKey,
 			shiftKey: ev.shiftKey,
-			x: ev.offsetX / this._zoom - ViewService.PADDING,
-			y: ev.offsetY / this._zoom - ViewService.PADDING
+			x: x / this._zoom - ViewService.PADDING,
+			y: y / this._zoom - ViewService.PADDING
 		};
 	}
 

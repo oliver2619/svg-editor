@@ -1,10 +1,15 @@
 import { ShapeModelType } from '../shape-model';
 import { ShapeContainerBuilder } from '../svg-builder/shape-container-builder';
-import { ImageProperties } from '../model-element-properties';
+import { ImageProperties } from '../properties/model-element-properties';
 import { BoxShapeModelImp } from './box-shape-model-imp';
+import { PathProperties } from '../properties/path-properties';
+import { ComponentRef, ViewContainerRef } from '@angular/core';
+import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
+import { MutableSvgModel } from '../svg-model';
 
 export class ImageModelImp extends BoxShapeModelImp {
 
+	readonly canConvertToPath = false;
 	readonly type = ShapeModelType.IMAGE;
 
 	private url: string;
@@ -19,10 +24,20 @@ export class ImageModelImp extends BoxShapeModelImp {
 	buildSvg(builder: ShapeContainerBuilder): void {
 		const image = builder.image(this.url, this.x, this.y, this.width, this.height);
 		image.preserveAspectRatio(this.preserveAspectRatio);
-		image.setRotation(this.rotation, this.x, this.y);
 		this.buildShapeAttributes(image);
+		this.buildBoxAttributes(image);
+	}
+
+	createPropertiesComponent(container: ViewContainerRef, model: MutableSvgModel): ComponentRef<any> {
+		const ret = container.createComponent(ShapePropertiesComponent);
+		ret.instance;
+		return ret;
 	}
 	
+	getConvertToPathProperties(): PathProperties {
+		throw new Error('Image can\'t be converted to a path');
+	}
+
 	override getMnemento(): ImageProperties {
 		return {
 			...super.getMnemento(),

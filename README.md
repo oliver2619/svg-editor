@@ -1,39 +1,27 @@
-## important (22)
-* flip horiz / vert: box
-* scale: ellipse -> adjust rotation when sx != sy
+## important (20)
+* selection properties
+	* circle: r
+	* ellipse: rx, ry, rotation, shape
+	* image: url, embedded, rotation, opacity
+	* rect: rx, ry, width, height, rotation, shape
 * linear gradient
 * radial gradient
 * pattern
+* flip horiz / vert: box how is x, y transformed?
 * svg import: color references url(...)
-* image
-	* rescale
-	* fit to content
-* convert to path
-* convert to polygon
-* convert to polyline
 * edit path
 	* ellipse
 	* circle
 	* rect
-	* polygon
-	* polyline
 	* line
 	* path
 * all shapes, text, library objects: gradient / pattern, stroke gradient / pattern
 * all lines, pencils: stroke gradient / pattern
-* paint preview: use selected shape properties (pencil, line, rect, circle, ellipse, polygon, path)
+* scale: ellipse -> adjust rotation when sx != sy
+* image
+	* rescale
+	* fit to content
 * layer view: nested groups
-
-## todo (9)
-* show grid
-* wireframe mode
-* duplicate selection
-* convert to clip path
-* path: reduce / smooth (add) vertices
-* transform pivot point
-* image link
-* Refactoring Tools component: law of demeter
-* clipping paths: crop image, move shape with clipping path: what happens?
 
 ## Tools (6)
 * insert library element -> list of objects -> mouse
@@ -44,6 +32,16 @@
 * line connect
 * measure -> draw handle -> translate parallel
 
+## todo (8)
+* show grid
+* wireframe mode
+* duplicate selection
+* convert to clip path
+* path: reduce / smooth (add) vertices
+* transform pivot point
+* image link
+* clipping paths: crop image, move shape with clipping path: what happens?
+
 ## other useful functions
 * create noise in shape
 * create hairs
@@ -53,7 +51,7 @@
 * new group, delete, rename, up, down, duplicate, merge down, (merge all)
 * object properties: id, class, visible(hidden, visible, exclusive), rotation angle, gaussian blur value, x, y, width, height, border-radius, fill color, strike color, strike style, line join, line cap, opacity, vector-settings
 
-## other (13)
+## other (14)
 * miniview (show visible part, scroll)
 * shortcuts
 * clip path list
@@ -67,6 +65,7 @@
 * timeline
 * editor settings: rulers
 * import apply all transformations
+* crop: draw handles and adjust
 
 ## maybe (9)
 * line marker
@@ -83,5 +82,4 @@
 
 # Bugs (2)
 * undo insert shape / redo remove group: when shape is selected causes error
-* has been checked error in tools component
 * box shapes: ViewService.getElementsContainingPoint and ViewService.getSelectionBoundingBox is not correct with transformations

@@ -58,7 +58,7 @@ export class ActionService {
 			icon: 'icons/draw_vertex.png'
 		}),
 		'edit.delete': new ViewAction(this.viewService, {
-			action: view => this.viewService.removeSelectedShapes(),
+			action: view => view.removeSelectedShapes(),
 			enabled: view => view.isAnyShapeSelected,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.delete'),
@@ -88,7 +88,7 @@ export class ActionService {
 			icon: 'icons/shape_flip_vertical.png'
 		}),
 		'edit.group': new ViewAction(this.viewService, {
-			action: view => this.viewService.groupSelected(),
+			action: view => view.groupSelected(),
 			enabled: view => view.areOnlyShapesFromOneGroupSelected && view.selectedIds.length > 1,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.group'),
@@ -121,7 +121,7 @@ export class ActionService {
 			shortcutModifiers: Shortcut.CTRL
 		}),
 		'edit.ungroup': new ViewAction(this.viewService, {
-			action: view => this.viewService.ungroupSelected(),
+			action: view => view.ungroupSelected(),
 			enabled: view => view.isSingleGroupSelected,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.ungroup'),
@@ -130,7 +130,7 @@ export class ActionService {
 			shortcutModifiers: Shortcut.CTRL | Shortcut.SHIFT
 		}),
 		'edit.z.bottom': new ViewAction(this.viewService, {
-			action: view => this.viewService.moveSelectedToBottom(),
+			action: view => view.moveSelectedToBottom(),
 			enabled: view => view.canMoveSelectionBackward,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.z.bottom'),
@@ -139,7 +139,7 @@ export class ActionService {
 			shortcutModifiers: Shortcut.CTRL | Shortcut.SHIFT
 		}),
 		'edit.z.backwards': new ViewAction(this.viewService, {
-			action: view => this.viewService.moveSelectedBackward(),
+			action: view => view.moveSelectedBackward(),
 			enabled: view => view.canMoveSelectionBackward,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.z.backwards'),
@@ -148,7 +148,7 @@ export class ActionService {
 			shortcutModifiers: Shortcut.CTRL
 		}),
 		'edit.z.forwards': new ViewAction(this.viewService, {
-			action: view => this.viewService.moveSelectedForward(),
+			action: view => view.moveSelectedForward(),
 			enabled: view => view.canMoveSelectionForward,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.z.forwards'),
@@ -157,7 +157,7 @@ export class ActionService {
 			shortcutModifiers: Shortcut.CTRL
 		}),
 		'edit.z.top': new ViewAction(this.viewService, {
-			action: view => this.viewService.moveSelectedToTop(),
+			action: view => view.moveSelectedToTop(),
 			enabled: view => view.canMoveSelectionForward,
 			group: this.textService.get('edit'),
 			name: this.textService.get('edit.z.top'),

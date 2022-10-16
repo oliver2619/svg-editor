@@ -1,10 +1,17 @@
 import { PathElementsBuilder } from '../svg-builder/path-builder';
-import { PathCmdProperties, PathCmdMoveProperties, PathCmdLineToProperties, PathCmdCloseProperties, PathCmdBezierCurveToProperties, PathCmdContinueBezierCurveToProperties, PathCmdQuadCurveToProperties, PathCmdContinueQuadCurveToProperties } from '../path-properties';
+import { PathCmdProperties, PathCmdMoveProperties, PathCmdLineToProperties, PathCmdCloseProperties, PathCmdBezierCurveToProperties, PathCmdContinueBezierCurveToProperties, PathCmdQuadCurveToProperties, PathCmdContinueQuadCurveToProperties } from '../properties/path-properties';
 import { Coordinate } from '../coordinate';
+import { VertexListBuilder } from '../svg-builder/vertex-list-builder';
 
 export abstract class PathCmdModelImp {
 
+	abstract readonly isLinear: boolean;
+	abstract readonly isNewSubPath: boolean;
+	abstract readonly isClosed: boolean;
+
 	abstract buildPathElement(builder: PathElementsBuilder): void;
+
+	abstract buildVertexList(builder: VertexListBuilder): void;
 
 	static create(properties: PathCmdProperties): PathCmdModelImp {
 		switch (properties.cmd) {
@@ -44,6 +51,10 @@ export abstract class PathCmdModelImp {
 
 class PathCmdMoveToModelImp extends PathCmdModelImp {
 
+	readonly isClosed = false;
+	readonly isLinear = true;
+	readonly isNewSubPath = true;
+
 	private x: number;
 	private y: number;
 
@@ -54,6 +65,8 @@ class PathCmdMoveToModelImp extends PathCmdModelImp {
 	}
 
 	buildPathElement(builder: PathElementsBuilder) { builder.moveTo(this.x, this.y); }
+
+	buildVertexList(builder: VertexListBuilder) { builder.addPoint(this.x, this.y); }
 
 	getMnemento(): PathCmdMoveProperties {
 		return {
@@ -73,6 +86,10 @@ class PathCmdMoveToModelImp extends PathCmdModelImp {
 
 class PathCmdLineToModelImp extends PathCmdModelImp {
 
+	readonly isClosed = false;
+	readonly isLinear = true;
+	readonly isNewSubPath = false;
+
 	private x: number;
 	private y: number;
 
@@ -83,6 +100,8 @@ class PathCmdLineToModelImp extends PathCmdModelImp {
 	}
 
 	buildPathElement(builder: PathElementsBuilder) { builder.lineTo(this.x, this.y); }
+
+	buildVertexList(builder: VertexListBuilder) { builder.addPoint(this.x, this.y); }
 
 	getMnemento(): PathCmdLineToProperties {
 		return {
@@ -102,6 +121,10 @@ class PathCmdLineToModelImp extends PathCmdModelImp {
 
 class PathCmdBezierCurveToModelImp extends PathCmdModelImp {
 
+	readonly isClosed = false;
+	readonly isLinear = false;
+	readonly isNewSubPath = false;
+
 	private hx1: number;
 	private hy1: number;
 	private hx2: number;
@@ -120,6 +143,8 @@ class PathCmdBezierCurveToModelImp extends PathCmdModelImp {
 	}
 
 	buildPathElement(builder: PathElementsBuilder) { builder.bezierCurveTo(this.hx1, this.hy1, this.hx2, this.hy2, this.x, this.y); }
+
+	buildVertexList(builder: VertexListBuilder) { throw new Error('Unsupported operation'); }
 
 	getMnemento(): PathCmdBezierCurveToProperties {
 		return {
@@ -151,6 +176,10 @@ class PathCmdBezierCurveToModelImp extends PathCmdModelImp {
 
 class PathCmdContinueCurveToModelImp extends PathCmdModelImp {
 
+	readonly isClosed = false;
+	readonly isLinear = false;
+	readonly isNewSubPath = false;
+
 	private hx: number;
 	private hy: number;
 	private x: number;
@@ -165,6 +194,8 @@ class PathCmdContinueCurveToModelImp extends PathCmdModelImp {
 	}
 
 	buildPathElement(builder: PathElementsBuilder) { builder.continueBezierCurveTo(this.hx, this.hy, this.x, this.y); }
+
+	buildVertexList(builder: VertexListBuilder) { throw new Error('Unsupported operation'); }
 
 	getMnemento(): PathCmdContinueBezierCurveToProperties {
 		return {
@@ -190,6 +221,10 @@ class PathCmdContinueCurveToModelImp extends PathCmdModelImp {
 
 class PathCmdQuadCurveToModelImp extends PathCmdModelImp {
 
+	readonly isClosed = false;
+	readonly isLinear = false;
+	readonly isNewSubPath = false;
+
 	private hx: number;
 	private hy: number;
 	private x: number;
@@ -204,6 +239,8 @@ class PathCmdQuadCurveToModelImp extends PathCmdModelImp {
 	}
 
 	buildPathElement(builder: PathElementsBuilder) { builder.quadraticCurveTo(this.hx, this.hy, this.x, this.y); }
+
+	buildVertexList(builder: VertexListBuilder) { throw new Error('Unsupported operation'); }
 
 	getMnemento(): PathCmdQuadCurveToProperties {
 		return {
@@ -229,6 +266,10 @@ class PathCmdQuadCurveToModelImp extends PathCmdModelImp {
 
 class PathCmdContinueQuadCurveToModelImp extends PathCmdModelImp {
 
+	readonly isClosed = false;
+	readonly isLinear = false;
+	readonly isNewSubPath = false;
+
 	private x: number;
 	private y: number;
 
@@ -239,6 +280,10 @@ class PathCmdContinueQuadCurveToModelImp extends PathCmdModelImp {
 	}
 
 	buildPathElement(builder: PathElementsBuilder) { builder.continueQuadraticCurveTo(this.x, this.y); }
+
+	buildVertexList(builder: VertexListBuilder) {
+		throw new Error('Unsupported operation');
+	}
 
 	getMnemento(): PathCmdContinueQuadCurveToProperties {
 		return {
@@ -258,11 +303,17 @@ class PathCmdContinueQuadCurveToModelImp extends PathCmdModelImp {
 
 class PathCmdCloseModelImp extends PathCmdModelImp {
 
+	readonly isClosed = true;
+	readonly isLinear = true;
+	readonly isNewSubPath = false;
+
 	constructor(props: PathCmdCloseProperties) {
 		super();
 	}
 
 	buildPathElement(builder: PathElementsBuilder) { builder.closePath(); }
+
+	buildVertexList(builder: VertexListBuilder) { }
 
 	getMnemento(): PathCmdCloseProperties {
 		return {

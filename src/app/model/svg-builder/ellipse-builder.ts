@@ -4,8 +4,10 @@ import { ShapeBuilder, ShapeBuilderImp } from './shape-builder';
 import { LineJoin, LineCap } from '../line-properties';
 import { VectorEffect } from '../vector-effect';
 import { SvgElementBuilderImp } from './svg-element-builder';
+import { BoxBuilder } from './box-builder';
+import { FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
 
-export class EllipseBuilder implements ShapeBuilder<SVGEllipseElement>, StrokedElementBuilder, FilledElementBuilder {
+export class EllipseBuilder implements BoxBuilder<SVGEllipseElement>, StrokedElementBuilder, FilledElementBuilder {
 
 	private readonly svg: SvgElementBuilderImp;
 	private readonly shape: ShapeBuilderImp;
@@ -17,6 +19,18 @@ export class EllipseBuilder implements ShapeBuilder<SVGEllipseElement>, StrokedE
 		this.shape = new ShapeBuilderImp(element);
 		this.fill = new FilledElementBuilderImp(element);
 		this.stroke = new StrokedElementBuilderImp(element);
+	}
+
+	setShapeProperties(properties: ShapeProperties): void {
+		this.shape.setShapeProperties(properties);
+	}
+
+	setFillProperties(properties: FillProperties): void {
+		this.fill.setFillProperties(properties);
+	}
+
+	setStrokeProperties(properties: StrokeProperties): void {
+		this.stroke.setStrokeProperties(properties);
 	}
 
 	setRotation(deg: number, px: number, py: number) {
@@ -32,6 +46,10 @@ export class EllipseBuilder implements ShapeBuilder<SVGEllipseElement>, StrokedE
 		this.element.cy.baseVal.value = cy;
 		this.element.rx.baseVal.value = rx;
 		this.element.ry.baseVal.value = ry;
+	}
+
+	setRect(x: number, y: number, width: number, height: number) {
+		this.setEllipse(x + width * .5, y + height * .5, width * .5, height * .5);
 	}
 
 	setAttribute(name: string, value: any): void {

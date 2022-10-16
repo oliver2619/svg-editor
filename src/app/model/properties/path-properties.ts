@@ -1,5 +1,5 @@
 import { ShapeProperties, FillProperties, StrokeProperties } from './model-element-properties';
-import { LineCap, LineJoin } from './line-properties';
+import { LineCap, LineJoin } from '../line-properties';
 
 export interface PathCmdProperties {
 	cmd: 'M' | 'L' | 'C' | 'S' | 'Q' | 'T' | 'Z';
@@ -56,7 +56,6 @@ export interface PathCmdCloseProperties extends PathCmdProperties {
 export interface PathProperties extends ShapeProperties {
 	fill: FillProperties;
 	stroke: StrokeProperties;
-	lineCap: LineCap;
 	lineJoin: LineJoin;
 	commands: ReadonlyArray<PathCmdProperties>;
 }

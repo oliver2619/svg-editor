@@ -1,6 +1,6 @@
 import { Color } from '../color/color';
 import { FilledElementBuilder } from '../svg-builder/filled-element-builder';
-import { FillProperties } from '../model-element-properties';
+import { FillProperties } from '../properties/model-element-properties';
 
 export class FillModelImp {
 

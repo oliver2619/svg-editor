@@ -1,7 +1,7 @@
 import { ToggleCommand, Command, ReverseCommand } from './command';
 import { MutableSvgModel, SvgModel } from '../svg-model';
-import { EllipseProperties, LineProperties, PolylineProperties, PolygonProperties, RectProperties, CircleProperties, ImageProperties, GroupProperties, ShapeProperties } from '../model-element-properties';
-import { PathProperties } from '../path-properties';
+import { EllipseProperties, LineProperties, RectProperties, CircleProperties, ImageProperties, GroupProperties, ShapeProperties } from '../properties/model-element-properties';
+import { PathProperties } from '../properties/path-properties';
 import { ShapeModelType } from '../shape-model';
 
 export class SetSizeCommand extends ToggleCommand {
@@ -134,40 +134,6 @@ export class AddPathCommand implements Command {
 	}
 }
 
-export class AddPolylineCommand implements Command {
-
-	private readonly properties: PolylineProperties;
-
-	constructor(private readonly id: string, properties: PolylineProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
-		this.properties = { ...properties, points: [...properties.points] };
-	}
-
-	redo(doc: MutableSvgModel) {
-		doc.addPolyline(this.id, this.properties, this.parentId, this.zIndex);
-	}
-
-	undo(doc: MutableSvgModel) {
-		doc.removeShape(this.id);
-	}
-}
-
-export class AddPolygonCommand implements Command {
-
-	private readonly properties: PolygonProperties;
-
-	constructor(private readonly id: string, properties: PolygonProperties, private readonly parentId: string | undefined, private readonly zIndex: number | undefined) {
-		this.properties = { ...properties, points: [...properties.points] };
-	}
-
-	redo(doc: MutableSvgModel) {
-		doc.addPolygon(this.id, this.properties, this.parentId, this.zIndex);
-	}
-
-	undo(doc: MutableSvgModel) {
-		doc.removeShape(this.id);
-	}
-}
-
 export class AddRectCommand implements Command {
 
 	private readonly properties: RectProperties;
@@ -225,7 +191,7 @@ export class TranslateShapeCommand implements Command {
 	}
 
 	undo(doc: MutableSvgModel): void {
-		doc.setShapeMnemento(this.id, this.mnemento);
+		doc.setShapeMnemento(this.id, this.mnemento!);
 	}
 }
 
@@ -241,7 +207,7 @@ export class RotateShapeCommand implements Command {
 	}
 
 	undo(doc: MutableSvgModel): void {
-		doc.setShapeMnemento(this.id, this.mnemento);
+		doc.setShapeMnemento(this.id, this.mnemento!);
 	}
 }
 
@@ -261,7 +227,7 @@ export class FlipShapeCommand implements Command {
 	}
 
 	undo(doc: MutableSvgModel): void {
-		doc.setShapeMnemento(this.id, this.mnemento);
+		doc.setShapeMnemento(this.id, this.mnemento!);
 	}
 }
 
@@ -277,8 +243,20 @@ export class ScaleShapeCommand implements Command {
 	}
 
 	undo(doc: MutableSvgModel): void {
-		doc.setShapeMnemento(this.id, this.mnemento);
+		doc.setShapeMnemento(this.id, this.mnemento!);
 	}
+}
+
+export class SetShapeMnementoCommand extends ToggleCommand {
+
+	constructor(private readonly id: string, private properties: ShapeProperties) { super(); }
+
+	redo(doc: MutableSvgModel): void {
+		const properties = doc.getShapeMnemento(this.id);
+		doc.setShapeMnemento(this.id, this.properties);
+		this.properties = properties;
+	}
+
 }
 
 export class Commands {
@@ -301,10 +279,6 @@ export class Commands {
 				return new ReverseCommand(new AddLineCommand(shapeId, properties as LineProperties, parentId, zIndex));
 			case ShapeModelType.PATH:
 				return new ReverseCommand(new AddPathCommand(shapeId, properties as PathProperties, parentId, zIndex));
-			case ShapeModelType.POLYGON:
-				return new ReverseCommand(new AddPolygonCommand(shapeId, properties as PolygonProperties, parentId, zIndex));
-			case ShapeModelType.POLYLINE:
-				return new ReverseCommand(new AddPolylineCommand(shapeId, properties as PolylineProperties, parentId, zIndex));
 			case ShapeModelType.RECT:
 				return new ReverseCommand(new AddRectCommand(shapeId, properties as RectProperties, parentId, zIndex));
 			default:

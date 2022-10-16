@@ -1,5 +1,5 @@
-import { CircleProperties, EllipseProperties, GroupProperties, ImageProperties, LineProperties, PolygonProperties, PolylineProperties, RectProperties } from "../model-element-properties";
-import { PathProperties } from "../path-properties";
+import { CircleProperties, EllipseProperties, GroupProperties, ImageProperties, LineProperties, RectProperties } from "../properties/model-element-properties";
+import { PathProperties } from "../properties/path-properties";
 
 export interface ImportContainerBuilder {
 
@@ -16,10 +16,6 @@ export interface ImportContainerBuilder {
 	line(id: string, properties: LineProperties): void;
 
 	path(id: string, properties: PathProperties): void;
-
-	polygon(id: string, properties: PolygonProperties): void;
-
-	polyline(id: string, properties: PolylineProperties): void;
 
 	rect(id: string, properties: RectProperties): void;
 }

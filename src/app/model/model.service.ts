@@ -1,17 +1,18 @@
 import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { SettingsService } from '../settings/settings.service';
-import { ChangeDocPropertiesCommand, SetSizeCommand, AddRectCommand, AddEllipseCommand, AddLineCommand, AddPolygonCommand, AddPolylineCommand, AddPathCommand, MoveShapeZIndexCommand, AddCircleCommand, AddImageCommand, TranslateShapeCommand, AddGroupCommand, MoveShapeToGroupCommand, Commands, RotateShapeCommand, ScaleShapeCommand, FlipShapeCommand } from './command/commands';
+import { ChangeDocPropertiesCommand, SetSizeCommand, AddRectCommand, AddEllipseCommand, AddLineCommand, AddPathCommand, MoveShapeZIndexCommand, AddCircleCommand, AddImageCommand, TranslateShapeCommand, AddGroupCommand, MoveShapeToGroupCommand, Commands, RotateShapeCommand, ScaleShapeCommand, FlipShapeCommand, SetShapeMnementoCommand } from './command/commands';
 import { MutableSvgModel, SvgModel } from './svg-model';
 import { CommandList } from './command/command-list';
 import { SvgModelImp } from './model-imp/model-imp';
 import { SvgBuilder } from './svg-builder/svg-builder';
-import { EllipseProperties, LineProperties, PolylineProperties, PolygonProperties, RectProperties, PatternProperties, GroupProperties, CircleProperties, ImageProperties } from './model-element-properties';
+import { EllipseProperties, LineProperties, RectProperties, PatternProperties, GroupProperties, CircleProperties, ImageProperties, ShapeProperties } from './properties/model-element-properties';
 import { ShapeModel, GroupModel, ShapeModelType } from './shape-model';
-import { PathProperties } from './path-properties';
+import { PathProperties } from './properties/path-properties';
 import { MultiCommand } from './command/command';
 import { SvgImporter } from './importer/svg-importer';
 import { SvgModelImportBuilder } from './importer/svg-model-import-builder';
+import { ReplaceShapeCommand } from './command/replace-shape-command';
 
 @Injectable({
 	providedIn: 'root'
@@ -76,16 +77,6 @@ export class ModelService implements MutableSvgModel {
 		this.onDocumentChange.next(this);
 	}
 
-	addPolyline(id: string, properties: PolylineProperties, parent: string | undefined, zIndex: number | undefined) {
-		this._cmdList.run(new AddPolylineCommand(id, properties, parent, zIndex));
-		this.onDocumentChange.next(this);
-	}
-
-	addPolygon(id: string, properties: PolygonProperties, parent: string | undefined, zIndex: number | undefined) {
-		this._cmdList.run(new AddPolygonCommand(id, properties, parent, zIndex));
-		this.onDocumentChange.next(this);
-	}
-
 	addRect(id: string, properties: RectProperties, parent: string | undefined, zIndex: number | undefined) {
 		this._cmdList.run(new AddRectCommand(id, properties, parent, zIndex));
 		this.onDocumentChange.next(this);
@@ -128,6 +119,12 @@ export class ModelService implements MutableSvgModel {
 	canMoveShapeBackward(id: string): boolean { return this._document.canMoveShapeBackward(id); }
 
 	canMoveShapeForward(id: string): boolean { return this._document.canMoveShapeForward(id); }
+
+	convertAllToPath(ids: string[]) {
+		const shapes = this._document.getTransformableShapes(ids);
+		this._cmdList.run(new MultiCommand(shapes.map(s => new ReplaceShapeCommand(s, ShapeModelType.PATH, this._document.getShapeById(s).getConvertToPathProperties()))));
+		this.onDocumentChange.next(this);
+	}
 
 	createSvg(builder: SvgBuilder) { this._document.createSvg(builder); }
 
@@ -260,6 +257,26 @@ export class ModelService implements MutableSvgModel {
 		throw new Error("Method not implemented.");
 	}
 
+	replaceShapeWithCircle(id: string, properties: CircleProperties): void {
+		throw new Error("Method not implemented.");
+	}
+
+	replaceShapeWithEllipse(id: string, properties: EllipseProperties): void {
+		throw new Error("Method not implemented.");
+	}
+
+	replaceShapeWithLine(id: string, properties: LineProperties): void {
+		throw new Error("Method not implemented.");
+	}
+
+	replaceShapeWithPath(id: string, properties: PathProperties): void {
+		throw new Error("Method not implemented.");
+	}
+
+	replaceShapeWithRect(id: string, properties: RectProperties): void {
+		throw new Error("Method not implemented.");
+	}
+
 	rotateShape(id: string, deg: number, px: number, py: number) {
 		throw new Error("Method not implemented.");
 	}
@@ -286,8 +303,9 @@ export class ModelService implements MutableSvgModel {
 		throw new Error("Method not implemented.");
 	}
 
-	setShapeMnemento(id: string, m: any) {
-		throw new Error("Method not implemented.");
+	setShapeMnemento(id: string, m: ShapeProperties) {
+		this._cmdList.run(new SetShapeMnementoCommand(id, m));
+		this.onDocumentChange.next(this);
 	}
 
 	setSize(width: number, height: number) {

@@ -1,8 +1,7 @@
-import { PathProperties } from "../path-properties";
-import { CircleProperties, EllipseProperties, GroupProperties, ImageProperties, LineProperties, PolygonProperties, PolylineProperties, RectProperties } from "../model-element-properties";
+import { PathProperties } from "../properties/path-properties";
+import { CircleProperties, EllipseProperties, GroupProperties, ImageProperties, LineProperties, RectProperties } from "../properties/model-element-properties";
 import { ImportBuilder, ImportContainerBuilder, ImportContentBuilder } from "./import-builder";
 import { SvgModelImp } from "../model-imp/model-imp";
-import { ModelAction } from "src/app/shared/action/model-action";
 
 export class SvgModelImportBuilder implements ImportBuilder {
 
@@ -34,17 +33,9 @@ class SvgModelContentImportBuilder implements ImportContentBuilder {
 	title(title: string): void {
 		this.model.setTitle(title);
 	}
-	
+
 	rect(id: string, properties: RectProperties): void {
 		this.container.rect(id, properties);
-	}
-
-	polyline(id: string, properties: PolylineProperties): void {
-		this.container.polyline(id, properties);
-	}
-
-	polygon(id: string, properties: PolygonProperties): void {
-		this.container.polygon(id, properties);
 	}
 
 	path(id: string, properties: PathProperties): void {
@@ -80,14 +71,6 @@ class SvgContainerImportBuilder implements ImportContainerBuilder {
 
 	rect(id: string, properties: RectProperties): void {
 		this.model.addRect(id, properties, this.parent, undefined);
-	}
-
-	polyline(id: string, properties: PolylineProperties): void {
-		this.model.addPolyline(id, properties, this.parent, undefined);
-	}
-
-	polygon(id: string, properties: PolygonProperties): void {
-		this.model.addPolygon(id, properties, this.parent, undefined);
 	}
 
 	path(id: string, properties: PathProperties): void {

@@ -16,7 +16,7 @@ export interface View {
 	readonly snapToGrid: boolean;
 	readonly zoom: number;
 
-	mouseEventToToolMouseEvent(ev: PointerEvent): ToolMouseEvent;
+	mouseEventToToolMouseEvent(ev: PointerEvent, x: number, y: number): ToolMouseEvent;
 
 	getSelectionBoundingBox(): SVGRect | undefined;
 }

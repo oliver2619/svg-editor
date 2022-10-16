@@ -3,8 +3,9 @@ import { StrokedElementBuilder, StrokedElementBuilderImp } from './stroked-eleme
 import { SvgElementBuilderImp } from './svg-element-builder';
 import { VectorEffect } from '../vector-effect';
 import { LineCap, LineJoin } from '../line-properties';
+import { ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
 
-export class LineBuilder implements ShapeBuilder<SVGLineElement>, StrokedElementBuilder{
+export class LineBuilder implements ShapeBuilder<SVGLineElement>, StrokedElementBuilder {
 
 	private readonly svg: SvgElementBuilderImp;
 	private readonly shape: ShapeBuilderImp;
@@ -14,6 +15,14 @@ export class LineBuilder implements ShapeBuilder<SVGLineElement>, StrokedElement
 		this.svg = new SvgElementBuilderImp(element);
 		this.shape = new ShapeBuilderImp(element);
 		this.stroke = new StrokedElementBuilderImp(element);
+	}
+
+	setShapeProperties(properties: ShapeProperties): void {
+		this.shape.setShapeProperties(properties);
+	}
+
+	setStrokeProperties(properties: StrokeProperties): void {
+		this.stroke.setStrokeProperties(properties);
 	}
 
 	setLine(x1: number, y1: number, x2: number, y2: number) {
@@ -34,7 +43,7 @@ export class LineBuilder implements ShapeBuilder<SVGLineElement>, StrokedElement
 	setId(id: string) {
 		this.svg.setId(id);
 	}
-	
+
 	setStrokeWidth(width: number): void {
 		this.stroke.setStrokeWidth(width);
 	}

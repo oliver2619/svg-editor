@@ -1,4 +1,5 @@
 import { LineCap, LineJoin } from '../line-properties';
+import { StrokeProperties } from '../properties/model-element-properties';
 
 export interface StrokedElementBuilder {
 
@@ -12,8 +13,9 @@ export interface StrokedElementBuilder {
 
 	setStrokeOpacity(opacity: number): void;
 
-	setStrokeWidth(width: number): void;
+	setStrokeProperties(properties: StrokeProperties): void;
 
+	setStrokeWidth(width: number): void;
 }
 
 export class StrokedElementBuilderImp implements StrokedElementBuilder {
@@ -46,6 +48,11 @@ export class StrokedElementBuilderImp implements StrokedElementBuilder {
 		} else {
 			this.element.removeAttribute('stroke-opacity');
 		}
+	}
+
+	setStrokeProperties(properties: StrokeProperties): void {
+		properties.color.buildStrokeAttributes(this);
+		properties.linePattern.buildAttributes(this);
 	}
 
 	setStrokeWidth(width: number) {

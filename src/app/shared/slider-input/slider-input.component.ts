@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs';
-import { ChangeDetectionStrategy, Component, OnInit, Input, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormControl, FormBuilder } from '@angular/forms';
 
 @Component({
@@ -8,13 +8,13 @@ import { AbstractControl, FormControl, FormBuilder } from '@angular/forms';
 	styleUrls: ['./slider-input.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SliderInputComponent implements OnInit, OnDestroy {
+export class SliderInputComponent implements OnChanges {
 
 	@Input('unit')
 	unit = '';
 
 	@Input('control')
-	controlInput: AbstractControl<number> | undefined;
+	numberControl: AbstractControl<number> | undefined;
 
 	@Input('min')
 	min = 0;
@@ -22,46 +22,51 @@ export class SliderInputComponent implements OnInit, OnDestroy {
 	@Input('max')
 	max = 100;
 
+	@Output('value-change')
+	onValueChange = new EventEmitter<number>();
+
 	private controlSubscription: Subscription | undefined;
 
-	control2: FormControl;
+	sliderControl: FormControl<number>;
 
 	get control(): FormControl<number> {
-		return this.controlInput as FormControl<number>;
+		return this.numberControl as FormControl<number>;
 	}
 
 	constructor(formBuilder: FormBuilder) {
-		this.control2 = formBuilder.control(0);
+		this.sliderControl = formBuilder.control(0) as FormControl<number>;
 	}
 
-	ngOnInit(): void {
-		let lock = false;
-		if (this.controlInput !== undefined) {
-			this.controlSubscription = this.controlInput.valueChanges.subscribe({
-				next: (v: number) => {
-					if (!lock) {
-						lock = true;
-						this.control2.setValue(v);
-						lock = false;
-					}
-				}
-			});
-			this.control2.setValue(this.controlInput.value);
-			this.control2.valueChanges.subscribe({
-				next: (v: number) => {
-					if (!lock) {
-						lock = true;
-						(this.controlInput as AbstractControl<number>).setValue(v);
-						lock = false;
-					}
+	ngOnChanges(changes: SimpleChanges): void {
+		if (this.controlSubscription === undefined && this.numberControl !== undefined) {
+			this.numberControl.valueChanges.subscribe({
+				next: () => {
+					this.sliderControl.setValue(this.numberControl!.value);
 				}
 			});
 		}
+		this.sliderControl.setValue(this.numberControl!.value);
 	}
 
 	ngOnDestroy(): void {
 		if (this.controlSubscription !== undefined) {
 			this.controlSubscription.unsubscribe();
 		}
+	}
+
+	onInputChange(e: HTMLInputElement) {
+		const v = Number(e.value);
+		this.onValueChange.emit(v);
+	}
+
+	onSliderChange(e: HTMLInputElement) {
+		const v = Number(e.value);
+		this.numberControl!.setValue(v);
+		this.onValueChange.emit(v);
+	}
+
+	onSliderInput(e: HTMLInputElement) {
+		const v = Number(e.value);
+		this.numberControl!.setValue(v);
 	}
 }

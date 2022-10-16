@@ -39,6 +39,10 @@ import { ToolHelpComponent } from './view/tool-help/tool-help.component';
 import { HelpAboutComponent } from './help/help-about/help-about.component';
 import { HelpShortcutsComponent } from './help/help-shortcuts/help-shortcuts.component';
 import { EditGeometryComponent } from './tools/edit-geometry/edit-geometry.component';
+import { SelectedEllipsePropertiesComponent } from './selection-properties/selected-ellipse-properties/selected-ellipse-properties.component';
+import { SelectedCirclePropertiesComponent } from './selection-properties/selected-circle-properties/selected-circle-properties.component';
+import { SelectedImagePropertiesComponent } from './selection-properties/selected-image-properties/selected-image-properties.component';
+import { SelectedRectPropertiesComponent } from './selection-properties/selected-rect-properties/selected-rect-properties.component';
 
 @NgModule({
 	declarations: [
@@ -76,7 +80,11 @@ import { EditGeometryComponent } from './tools/edit-geometry/edit-geometry.compo
 		ToolHelpComponent,
 		HelpAboutComponent,
 		HelpShortcutsComponent,
-  EditGeometryComponent
+  EditGeometryComponent,
+  SelectedEllipsePropertiesComponent,
+  SelectedCirclePropertiesComponent,
+  SelectedImagePropertiesComponent,
+  SelectedRectPropertiesComponent
 	],
 	imports: [
 		BrowserModule,

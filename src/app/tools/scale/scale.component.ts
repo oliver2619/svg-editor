@@ -29,7 +29,7 @@ export class ScaleTool extends AbstractMoveTool {
 	}
 
 	getHint(textService: TextService): string {
-		return '';
+		return textService.get('tool.scale.help');
 	}
 
 	protected onMouseDown(e: ToolMouseEvent): void {

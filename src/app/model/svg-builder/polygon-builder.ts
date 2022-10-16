@@ -4,8 +4,10 @@ import { StrokedElementBuilder, StrokedElementBuilderImp } from './stroked-eleme
 import { ShapeBuilder, ShapeBuilderImp } from './shape-builder';
 import { VectorEffect } from '../vector-effect';
 import { LineCap, LineJoin } from '../line-properties';
+import { FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
+import { VertexListBuilder } from './vertex-list-builder';
 
-export class PolygonBuilder implements ShapeBuilder<SVGPolygonElement>, StrokedElementBuilder, FilledElementBuilder {
+export class PolygonBuilder implements ShapeBuilder<SVGPolygonElement>, StrokedElementBuilder, FilledElementBuilder, VertexListBuilder {
 
 	private readonly svg: SvgElementBuilderImp;
 	private readonly shape: ShapeBuilderImp;
@@ -54,12 +56,24 @@ export class PolygonBuilder implements ShapeBuilder<SVGPolygonElement>, StrokedE
 		this.fill.setFillColor(color);
 	}
 
-	setStrokeWidth(width: number): void {
-		this.stroke.setStrokeWidth(width);
+	setFillProperties(properties: FillProperties): void {
+		this.fill.setFillProperties(properties);
+	}
+
+	setShapeProperties(properties: ShapeProperties): void {
+		this.shape.setShapeProperties(properties);
 	}
 
 	setStrokeOpacity(opacity: number): void {
 		this.stroke.setStrokeOpacity(opacity);
+	}
+
+	setStrokeProperties(properties: StrokeProperties): void {
+		this.stroke.setStrokeProperties(properties);
+	}
+
+	setStrokeWidth(width: number): void {
+		this.stroke.setStrokeWidth(width);
 	}
 
 	setStrokeDashArray(array: number[]): void {

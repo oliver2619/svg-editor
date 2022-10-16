@@ -123,6 +123,7 @@ export const DICTIONARY_EN: Dictionary = {
 	'tool.rotate': 'Rotate objects',
 	'tool.rotate.hint': '[Shift]: Rotate by distinct angles',
 	'tool.scale': 'Scale objects',
+	'tool.scale.help': '[Shift]: Scale width and height separately',
 	'tool.select': 'Select objects',
 	'tool.select.all': 'All elements',
 	'tool.select.groups': 'Groups',

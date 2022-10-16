@@ -4,12 +4,13 @@ import { LineBuilder } from '../model/svg-builder/line-builder';
 import { ShapePropertiesComponent } from '../shape-properties/shape-properties.component';
 import { ViewService } from '../view/view.service';
 import { ViewContainerRef, ComponentRef } from '@angular/core';
+import { ShapePropertiesComponentInterface } from '../shape-properties/shape-properties-component-interface';
 
 export class LineTool extends AbstractDrawTool {
 
 	private readonly group: GroupBuilder;
 	private line: LineBuilder | undefined;
-	private propertiesComponent: ShapePropertiesComponent | undefined;
+	private propertiesComponent: ShapePropertiesComponentInterface | undefined;
 
 	constructor(viewService: ViewService) {
 		super(viewService);
@@ -27,7 +28,6 @@ export class LineTool extends AbstractDrawTool {
 		const ret = container.createComponent(ShapePropertiesComponent);
 		ret.setInput('fill', false);
 		ret.setInput('global', true);
-		ret.setInput('line-cap', true);
 		ret.setInput('line-join', false);
 		this.propertiesComponent = ret.instance;
 		return ret;
@@ -42,8 +42,7 @@ export class LineTool extends AbstractDrawTool {
 				y1: startY,
 				x2: targetX,
 				y2: targetY,
-				stroke: this.propertiesComponent.strokeProperties,
-				lineCap: this.propertiesComponent.lineCap
+				stroke: this.propertiesComponent.strokeProperties
 			});
 		}
 	}
@@ -56,7 +55,10 @@ export class LineTool extends AbstractDrawTool {
 
 	protected onStart(x: number, y: number): void {
 		this.line = this.group.line(x, y, x, y);
-		this.line.setStrokeColor('black');
+		if (this.propertiesComponent !== undefined) {
+			this.line.setShapeProperties(this.propertiesComponent.shapeProperties);
+			this.line.setStrokeProperties(this.propertiesComponent.strokeProperties);
+		}
 	}
 }
 

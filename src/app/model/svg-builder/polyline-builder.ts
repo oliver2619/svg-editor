@@ -4,8 +4,10 @@ import { FilledElementBuilder, FilledElementBuilderImp } from './filled-element-
 import { SvgElementBuilderImp } from './svg-element-builder';
 import { VectorEffect } from '../vector-effect';
 import { LineCap, LineJoin } from '../line-properties';
+import { FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
+import { VertexListBuilder } from './vertex-list-builder';
 
-export class PolylineBuilder implements ShapeBuilder<SVGPolylineElement>, StrokedElementBuilder, FilledElementBuilder {
+export class PolylineBuilder implements ShapeBuilder<SVGPolylineElement>, StrokedElementBuilder, FilledElementBuilder, VertexListBuilder {
 
 	private readonly svg: SvgElementBuilderImp;
 	private readonly shape: ShapeBuilderImp;
@@ -54,12 +56,24 @@ export class PolylineBuilder implements ShapeBuilder<SVGPolylineElement>, Stroke
 		this.fill.setFillColor(color);
 	}
 
-	setStrokeWidth(width: number): void {
-		this.stroke.setStrokeWidth(width);
+	setFillProperties(properties: FillProperties): void {
+		this.fill.setFillProperties(properties);
+	}
+
+	setShapeProperties(properties: ShapeProperties): void {
+		this.shape.setShapeProperties(properties);
 	}
 
 	setStrokeOpacity(opacity: number): void {
 		this.stroke.setStrokeOpacity(opacity);
+	}
+
+	setStrokeProperties(properties: StrokeProperties): void {
+		this.stroke.setStrokeProperties(properties);
+	}
+
+	setStrokeWidth(width: number): void {
+		this.stroke.setStrokeWidth(width);
 	}
 
 	setStrokeDashArray(array: number[]): void {

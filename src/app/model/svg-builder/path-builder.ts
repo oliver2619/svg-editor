@@ -5,7 +5,8 @@ import { ShapeBuilder, ShapeBuilderImp } from './shape-builder';
 import { VectorEffect } from '../vector-effect';
 import { LineCap, LineJoin } from '../line-properties';
 import { Coordinate } from '../coordinate';
-import { PathCmdBezierCurveToProperties, PathCmdContinueBezierCurveToProperties, PathCmdContinueQuadCurveToProperties, PathCmdLineToProperties, PathCmdMoveProperties, PathCmdProperties, PathCmdQuadCurveToProperties } from '../path-properties';
+import { PathCmdBezierCurveToProperties, PathCmdContinueBezierCurveToProperties, PathCmdContinueQuadCurveToProperties, PathCmdLineToProperties, PathCmdMoveProperties, PathCmdProperties, PathCmdQuadCurveToProperties } from '../properties/path-properties';
+import { FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
 
 export class PathElementsBuilder {
 
@@ -159,6 +160,18 @@ export class PathBuilder implements ShapeBuilder<SVGPathElement>, StrokedElement
 
 	setFillColor(color: string): void {
 		this.fill.setFillColor(color);
+	}
+
+	setFillProperties(properties: FillProperties): void {
+		this.fill.setFillProperties(properties);
+	}
+
+	setShapeProperties(properties: ShapeProperties): void {
+		this.shape.setShapeProperties(properties);
+	}
+
+	setStrokeProperties(properties: StrokeProperties): void {
+		this.stroke.setStrokeProperties(properties);
 	}
 
 	setStrokeWidth(width: number): void {

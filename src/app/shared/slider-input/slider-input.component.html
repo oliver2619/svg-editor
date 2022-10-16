@@ -1,1 +1,3 @@
-<input type="number" [formControl]="control" [min]="min" [max]="max"><span>{{unit}}</span><input type="range" [formControl]="control2" [min]="min" [max]="max">
+<input #number type="number" [formControl]="control" [min]="min" [max]="max" (change)="onInputChange(number)">
+<span>{{unit}}</span>
+<input #slider type="range" [formControl]="sliderControl" [min]="min" [max]="max" (input)="onSliderInput(slider)" (change)="onSliderChange(slider)">

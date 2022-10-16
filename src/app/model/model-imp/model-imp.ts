@@ -4,16 +4,14 @@ import { ShapeModelImp } from './shape-model-imp';
 import { EllipseModelImp } from './ellipse-model-imp';
 import { LineModelImp } from './line-model-imp';
 import { PathModelImp } from './path-model-imp';
-import { PolylineModelImp } from './polyline-model-imp';
-import { PolygonModelImp } from './polygon-model-imp';
 import { RectModelImp } from './rect-model-imp';
 import { GroupModelImp } from './group-model-imp';
-import { CircleProperties, EllipseProperties, GroupProperties, LineProperties, PatternProperties, PolylineProperties, PolygonProperties, RectProperties, ImageProperties } from '../model-element-properties';
+import { CircleProperties, EllipseProperties, GroupProperties, LineProperties, PatternProperties, RectProperties, ImageProperties } from '../properties/model-element-properties';
 import { ShapeModel, ShapeModelType } from '../shape-model';
 import { ShapeContainerModelImp } from './shape-container-model-imp';
 import { CircleModelImp } from './circle-model-imp';
 import { ImageModelImp } from './image-model-imp';
-import { PathProperties } from '../path-properties';
+import { PathProperties } from '../properties/path-properties';
 
 export class SvgModelImp implements MutableSvgModel {
 
@@ -85,16 +83,6 @@ export class SvgModelImp implements MutableSvgModel {
 
 	addPattern(id: string, properties: PatternProperties) {
 		throw new Error("Method not implemented.");
-	}
-
-	addPolyline(id: string, properties: PolylineProperties, parent: string | undefined, zIndex: number | undefined) {
-		const p = new PolylineModelImp(id, parent, properties);
-		this.addShape(p, parent, zIndex);
-	}
-
-	addPolygon(id: string, properties: PolygonProperties, parent: string | undefined, zIndex: number | undefined) {
-		const p = new PolygonModelImp(id, parent, properties);
-		this.addShape(p, parent, zIndex);
 	}
 
 	addRect(id: string, properties: RectProperties, parent: string | undefined, zIndex: number | undefined) {
@@ -269,6 +257,36 @@ export class SvgModelImp implements MutableSvgModel {
 		}
 	}
 
+	replaceShapeWithCircle(id: string, properties: CircleProperties): void {
+		const oldShape = this.getShapeById(id);
+		const newShape = new CircleModelImp(id, oldShape.parentId, properties);
+		this.replaceShape(oldShape, newShape);
+	}
+
+	replaceShapeWithEllipse(id: string, properties: EllipseProperties): void {
+		const oldShape = this.getShapeById(id);
+		const newShape = new EllipseModelImp(id, oldShape.parentId, properties);
+		this.replaceShape(oldShape, newShape);
+	}
+
+	replaceShapeWithLine(id: string, properties: LineProperties): void {
+		const oldShape = this.getShapeById(id);
+		const newShape = new LineModelImp(id, oldShape.parentId, properties);
+		this.replaceShape(oldShape, newShape);
+	}
+
+	replaceShapeWithPath(id: string, properties: PathProperties): void {
+		const oldShape = this.getShapeById(id);
+		const newShape = new PathModelImp(id, oldShape.parentId, properties);
+		this.replaceShape(oldShape, newShape);
+	}
+
+	replaceShapeWithRect(id: string, properties: RectProperties): void {
+		const oldShape = this.getShapeById(id);
+		const newShape = new RectModelImp(id, oldShape.parentId, properties);
+		this.replaceShape(oldShape, newShape);
+	}
+
 	rotateShape(id: string, deg: number, px: number, py: number) { this.getShapeById(id).rotate(deg, px, py); }
 
 	scaleShape(id: string, sx: number, sy: number, px: number, py: number): void { this.getShapeById(id).scale(sx, sy, px, py); }
@@ -292,5 +310,14 @@ export class SvgModelImp implements MutableSvgModel {
 			throw new RangeError(`Parent shape ${parentId} not found or is no group`);
 		}
 		return parent;
+	}
+
+	private replaceShape(oldShape: ShapeModelImp, newShape: ShapeModelImp) {
+		this.shapesById.set(oldShape.id, newShape);
+		if (oldShape.parentId === undefined) {
+			this.shapeContainer.replaceShape(oldShape, newShape);
+		} else {
+			this.getParent(oldShape.parentId).replaceShape(oldShape, newShape);
+		}
 	}
 }

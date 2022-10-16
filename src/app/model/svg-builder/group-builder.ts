@@ -14,6 +14,7 @@ import { RectBuilder } from './rect-builder';
 import { CircleBuilder } from './circle-builder';
 import { SvgBuilder } from './svg-builder';
 import { ImageBuilder } from './image-builder';
+import { FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
 
 export class GroupBuilder implements ShapeContainerBuilder, ShapeBuilder<SVGGElement>, StrokedElementBuilder, FilledElementBuilder {
 
@@ -29,6 +30,18 @@ export class GroupBuilder implements ShapeContainerBuilder, ShapeBuilder<SVGGEle
 		this.fill = new FilledElementBuilderImp(element);
 		this.stroke = new StrokedElementBuilderImp(element);
 		this.container = new ShapeContainerBuilderImp(element);
+	}
+
+	setShapeProperties(properties: ShapeProperties): void {
+		this.shape.setShapeProperties(properties);
+	}
+
+	setFillProperties(properties: FillProperties): void {
+		this.fill.setFillProperties(properties);
+	}
+
+	setStrokeProperties(properties: StrokeProperties): void {
+		this.stroke.setStrokeProperties(properties);
 	}
 
 	svg(): SvgBuilder {

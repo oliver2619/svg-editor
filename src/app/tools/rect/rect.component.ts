@@ -5,6 +5,8 @@ import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-propert
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { GroupBuilder } from 'src/app/model/svg-builder/group-builder';
 import { RectBuilder } from 'src/app/model/svg-builder/rect-builder';
+import { FillProperties, ShapeProperties, StrokeProperties } from 'src/app/model/properties/model-element-properties';
+import { LineJoin } from 'src/app/model/line-properties';
 
 export class RectTool extends AbstractDrawTool {
 
@@ -42,9 +44,9 @@ export class RectTool extends AbstractDrawTool {
 				rx: this.propertiesComponent.rx,
 				ry: this.propertiesComponent.ry,
 				rotation: 0,
-				fill: this.propertiesComponent.shapePropertiesComponent.fillProperties,
-				stroke: this.propertiesComponent.shapePropertiesComponent.strokeProperties,
-				lineJoin: this.propertiesComponent.shapePropertiesComponent.lineJoin
+				fill: this.propertiesComponent.fillProperties,
+				stroke: this.propertiesComponent.strokeProperties,
+				lineJoin: this.propertiesComponent.lineJoin
 			});
 		}
 	}
@@ -57,8 +59,11 @@ export class RectTool extends AbstractDrawTool {
 
 	protected onStart(x: number, y: number): void {
 		this.rect = this.group.rect(x, y, 0, 0);
-		this.rect.setStrokeColor('black');
-		this.rect.setFillColor('none');
+		if(this.propertiesComponent !== undefined) {
+			this.rect.setFillProperties(this.propertiesComponent.fillProperties);
+			this.rect.setStrokeProperties(this.propertiesComponent.strokeProperties);
+			this.rect.setShapeProperties(this.propertiesComponent.shapeProperties);
+		}
 	}
 }
 
@@ -80,22 +85,23 @@ export class RectComponent {
 
 	readonly formGroup: FormGroup;
 
-	get rx(): number {
-		return this.value.rx;
-	}
+	get fillProperties(): FillProperties {return this.shapePropertiesComponent!.fillProperties; }
 
-	get ry(): number {
-		return this.value.ry;
-	}
+	get strokeProperties(): StrokeProperties {return this.shapePropertiesComponent!.strokeProperties; }
 
-	private get value(): RectComponentValue {
-		return this.formGroup.value;
-	}
+	get shapeProperties(): ShapeProperties {return this.shapePropertiesComponent!.shapeProperties; }
+
+	get lineJoin(): LineJoin {return this.shapePropertiesComponent!.lineJoin; }
+
+	get rx(): number {		return this.value.rx;	}
+
+	get ry(): number {		return this.value.ry;	}
+
+	private get value(): RectComponentValue {		return this.formGroup.value;	}
 
 	constructor(formBuilder: FormBuilder) {
 		this.formGroup = formBuilder.group({});
 		this.formGroup.addControl('rx', formBuilder.control(0, [Validators.required, Validators.min(0)]))
 		this.formGroup.addControl('ry', formBuilder.control(0, [Validators.required, Validators.min(0)]))
 	}
-
 }

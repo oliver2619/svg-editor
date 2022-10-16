@@ -1,7 +1,7 @@
 import { SvgBuilder } from './svg-builder/svg-builder';
-import { CircleProperties, EllipseProperties, GroupProperties, LineProperties, PatternProperties, PolylineProperties, PolygonProperties, RectProperties, ImageProperties, ShapeProperties } from './model-element-properties';
+import { CircleProperties, EllipseProperties, GroupProperties, LineProperties, PatternProperties, RectProperties, ImageProperties, ShapeProperties } from './properties/model-element-properties';
 import { ShapeModel, GroupModel } from './shape-model';
-import { PathProperties } from './path-properties';
+import { PathProperties } from './properties/path-properties';
 
 export interface SvgModel {
 
@@ -66,10 +66,6 @@ export interface MutableSvgModel extends SvgModel {
 
 	addPattern(id: string, properties: PatternProperties): void;
 
-	addPolyline(id: string, properties: PolylineProperties, parent: string | undefined, zIndex: number | undefined): void;
-
-	addPolygon(id: string, properties: PolygonProperties, parent: string | undefined, zIndex: number | undefined): void;
-
 	addRect(id: string, properties: RectProperties, parent: string | undefined, zIndex: number | undefined): void;
 
 	flipShapeH(id: string, px: number): void;
@@ -90,11 +86,21 @@ export interface MutableSvgModel extends SvgModel {
 
 	removeShape(id: string): void;
 
+	replaceShapeWithCircle(id: string, properties: CircleProperties): void;
+
+	replaceShapeWithEllipse(id: string, properties: EllipseProperties): void;
+
+	replaceShapeWithLine(id: string, properties: LineProperties): void;
+
+	replaceShapeWithPath(id: string, properties: PathProperties): void;
+
+	replaceShapeWithRect(id: string, properties: RectProperties): void;
+
 	rotateShape(id: string, deg: number, px: number, py: number): void;
 
 	scaleShape(id: string, sx: number, sy: number, px: number, py: number): void;
 
-	setShapeMnemento(id: string, m: any): void;
+	setShapeMnemento(id: string, m: ShapeProperties): void;
 
 	setSize(width: number, height: number): void;
 

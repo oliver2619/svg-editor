@@ -48,17 +48,20 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
 
 	onSvgPointerDown(ev: PointerEvent, local: boolean) {
 		if (ev.button === 0 && this.toolService.requiresLocalCoordinates === local) {
-			const tev = local ? this.viewService.mouseEventToToolMouseEvent(ev) : this.mouseEventToToolMouseEvent(ev);
+			const tev = local ? this.viewService.mouseEventToToolMouseEvent(ev, ev.offsetX, ev.offsetY) : this.mouseEventToToolMouseEvent(ev);
 			if (this.toolService.mouseDown(tev)) {
-				((this.container as ElementRef<HTMLDivElement>).nativeElement).setPointerCapture(ev.pointerId);
+				const target = local ? (this.container as ElementRef<HTMLDivElement>).nativeElement : ev.target as HTMLElement;
+				target.setPointerCapture(ev.pointerId);
 			}
 		}
 	}
 
 	onSvgPointerMove(ev: PointerEvent, local: boolean) {
 		if (this.toolService.requiresLocalCoordinates === local) {
-			const tev = local ? this.viewService.mouseEventToToolMouseEvent(ev) : this.mouseEventToToolMouseEvent(ev);
-			if (((this.container as ElementRef<HTMLDivElement>).nativeElement).hasPointerCapture(ev.pointerId)) {
+			const target = local ? (this.container as ElementRef<HTMLDivElement>).nativeElement : ev.target as HTMLElement;
+			const capture = target.hasPointerCapture(ev.pointerId);
+			const tev = local ? this.viewService.mouseEventToToolMouseEvent(ev, capture ? ev.offsetX + target.scrollLeft : ev.offsetX, capture ? ev.offsetY + target.scrollTop : ev.offsetY) : this.mouseEventToToolMouseEvent(ev);
+			if (capture) {
 				this.toolService.mouseMove(tev);
 			} else {
 				this.toolService.mouseHover(tev);
@@ -71,9 +74,10 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
 
 	onSvgPointerUp(ev: PointerEvent, local: boolean) {
 		if (this.toolService.requiresLocalCoordinates === local) {
-			const target = ((this.container as ElementRef<HTMLDivElement>).nativeElement);
-			if (ev.button === 0 && target.hasPointerCapture(ev.pointerId)) {
-				const tev = local ? this.viewService.mouseEventToToolMouseEvent(ev) : this.mouseEventToToolMouseEvent(ev);
+			const target = local ? (this.container as ElementRef<HTMLDivElement>).nativeElement : ev.target as HTMLElement;
+			const capture = target.hasPointerCapture(ev.pointerId);
+			if (ev.button === 0 && capture) {
+				const tev = local ? this.viewService.mouseEventToToolMouseEvent(ev, ev.offsetX + target.scrollLeft, ev.offsetY + target.scrollTop) : this.mouseEventToToolMouseEvent(ev);
 				this.toolService.mouseUp(tev);
 				target.releasePointerCapture(ev.pointerId);
 			}

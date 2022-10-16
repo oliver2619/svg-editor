@@ -1,5 +1,6 @@
 import { Coordinate } from "../coordinate";
-import { BoxProperties } from "../model-element-properties";
+import { BoxProperties } from "../properties/model-element-properties";
+import { BoxBuilder } from "../svg-builder/box-builder";
 import { ShapeModelImp } from "./shape-model-imp";
 
 export abstract class BoxShapeModelImp extends ShapeModelImp {
@@ -69,5 +70,9 @@ export abstract class BoxShapeModelImp extends ShapeModelImp {
     translate(dx: number, dy: number) {
         this.x += dx;
         this.y += dy;
+    }
+
+    protected buildBoxAttributes(builder: BoxBuilder<any>) {
+        builder.setRotation(this.rotation, this.x, this.y);
     }
 }

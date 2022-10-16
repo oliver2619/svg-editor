@@ -41,6 +41,15 @@ export class ShapeContainerModelImp {
 		this.shapes.splice(i, 1);
 	}
 
+	replaceShape(oldShape: ShapeModelImp, newShape: ShapeModelImp) {
+		const i = this.shapes.findIndex(s => s.id === oldShape.id);
+		if (i >= 0) {
+			this.shapes[i] = newShape;
+		} else {
+			throw new Error(`Shape ${oldShape.id} not found in container`);
+		}
+	}
+
 	setShapeZIndex(id: string, zIndex: number) {
 		if (zIndex < 0 || zIndex >= this.shapes.length) {
 			throw new RangeError(`Shape index ${zIndex} out of range`);

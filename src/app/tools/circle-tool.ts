@@ -4,12 +4,16 @@ import { ShapePropertiesComponent } from '../shape-properties/shape-properties.c
 import { ViewService } from '../view/view.service';
 import { ViewContainerRef, ComponentRef } from '@angular/core';
 import { CircleBuilder } from '../model/svg-builder/circle-builder';
+import { FillModelImp } from '../model/model-imp/fill-model-imp';
+import { StrokeModelImp } from '../model/model-imp/stroke-model-imp';
+import { ShapePropertiesComponentInterface } from '../shape-properties/shape-properties-component-interface';
+import { ShapeModelImp } from '../model/model-imp/shape-model-imp';
 
 export class CircleTool extends AbstractDrawTool {
 
 	private readonly group: GroupBuilder;
 	private circle: CircleBuilder | undefined;
-	private propertiesComponent: ShapePropertiesComponent | undefined;
+	private propertiesComponent: ShapePropertiesComponentInterface | undefined;
 
 	constructor(viewService: ViewService) {
 		super(viewService);
@@ -26,7 +30,6 @@ export class CircleTool extends AbstractDrawTool {
 	createPropertiesComponent(container: ViewContainerRef): ComponentRef<any> | undefined {
 		const ret = container.createComponent(ShapePropertiesComponent);
 		ret.setInput('global', true);
-		ret.setInput('line-cap', false);
 		ret.setInput('line-join', false);
 		this.propertiesComponent = ret.instance;
 		return ret;
@@ -54,7 +57,10 @@ export class CircleTool extends AbstractDrawTool {
 
 	protected onStart(x: number, y: number): void {
 		this.circle = this.group.circle(x, y, 0);
-		this.circle.setStrokeColor('black');
-		this.circle.setFillColor('none');
+		if (this.propertiesComponent !== undefined) {
+			this.circle.setFillProperties(this.propertiesComponent.fillProperties);
+			this.circle.setStrokeProperties(this.propertiesComponent.strokeProperties);
+			this.circle.setShapeProperties(this.propertiesComponent.shapeProperties);
+		}
 	}
 }

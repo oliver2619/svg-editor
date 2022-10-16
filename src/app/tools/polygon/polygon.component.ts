@@ -6,6 +6,9 @@ import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-propert
 import { Coordinate } from 'src/app/model/coordinate';
 import { GroupBuilder } from 'src/app/model/svg-builder/group-builder';
 import { PolygonBuilder } from 'src/app/model/svg-builder/polygon-builder';
+import { FillProperties, ShapeProperties, StrokeProperties } from 'src/app/model/properties/model-element-properties';
+import { LineJoin } from 'src/app/model/line-properties';
+import { PathPropertiesBuilder } from 'src/app/model/properties/path-properties-builder';
 
 export class PolygonTool extends AbstractDrawTool {
 
@@ -24,7 +27,7 @@ export class PolygonTool extends AbstractDrawTool {
 			this.polygon = undefined;
 		}
 	}
-	
+
 	createPropertiesComponent(container: ViewContainerRef): ComponentRef<any> | undefined {
 		const ret = container.createComponent(PolygonComponent);
 		this.polygonComponent = ret.instance;
@@ -34,12 +37,21 @@ export class PolygonTool extends AbstractDrawTool {
 	protected onComplete(startX: number, startY: number, targetX: number, targetY: number): void {
 		this.cleanUp();
 		if (this.polygonComponent !== undefined && this.polygonComponent.shapePropertiesComponent !== undefined) {
-			this.viewService.addPolygon({
-				...this.polygonComponent.shapePropertiesComponent.shapeProperties,
-				fill: this.polygonComponent.shapePropertiesComponent.fillProperties,
-				stroke: this.polygonComponent.shapePropertiesComponent.strokeProperties,
-				lineJoin: this.polygonComponent.shapePropertiesComponent.lineJoin,
-				points: this.createPoints(startX, startY, targetX, targetY, this.polygonComponent.value)
+			const points = this.createPoints(startX, startY, targetX, targetY, this.polygonComponent.value);
+			const builder = new PathPropertiesBuilder();
+			points.forEach((p, i) => {
+				if (i === 0) {
+					builder.moveTo(p.x, p.y);
+				} else {
+					builder.lineTo(p.x, p.y);
+				}
+			});
+			this.viewService.addPath({
+				...this.polygonComponent.shapeProperties,
+				fill: this.polygonComponent.fillProperties,
+				stroke: this.polygonComponent.strokeProperties,
+				lineJoin: this.polygonComponent.lineJoin,
+				commands: builder.close().getCommands()
 			});
 		}
 	}
@@ -53,8 +65,12 @@ export class PolygonTool extends AbstractDrawTool {
 
 	protected onStart(x: number, y: number): void {
 		this.polygon = this.group.polygon();
-		this.polygon.setStrokeColor('black');
-		this.polygon.setFillColor('none');
+		if (this.polygonComponent !== undefined) {
+			this.polygon.setShapeProperties(this.polygonComponent.shapeProperties);
+			this.polygon.setFillProperties(this.polygonComponent.fillProperties);
+			this.polygon.setStrokeProperties(this.polygonComponent.strokeProperties);
+			this.polygon.setLineJoin(this.polygonComponent.lineJoin);
+		}
 	}
 
 	private createPoints(startX: number, startY: number, targetX: number, targetY: number, properties: PolygonComponentValue): Coordinate[] {
@@ -90,6 +106,14 @@ export class PolygonComponent {
 	shapePropertiesComponent: ShapePropertiesComponent | undefined;
 
 	readonly formGroup: FormGroup;
+
+	get fillProperties(): FillProperties { return this.shapePropertiesComponent!.fillProperties; }
+
+	get strokeProperties(): StrokeProperties { return this.shapePropertiesComponent!.strokeProperties; }
+
+	get shapeProperties(): ShapeProperties { return this.shapePropertiesComponent!.shapeProperties; }
+
+	get lineJoin(): LineJoin { return this.shapePropertiesComponent!.lineJoin; }
 
 	get value(): PolygonComponentValue {
 		return this.formGroup.value;

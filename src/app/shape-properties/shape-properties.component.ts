@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, ViewChild, ElementRef, AfterViewInit, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewChild, ElementRef, AfterViewInit, OnInit, Output, EventEmitter } from '@angular/core';
 import { Action } from '../shared/action/action';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TextService } from '../shared/text/text.service';
@@ -12,9 +12,10 @@ import { VectorEffect } from '../model/vector-effect';
 import { SimpleAction } from '../shared/action/simple-action';
 import { FilledElementBuilderImp } from '../model/svg-builder/filled-element-builder';
 import { StrokedElementBuilderImp } from '../model/svg-builder/stroked-element-builder';
-import { FillProperties, ShapeProperties, StrokeProperties } from '../model/model-element-properties';
+import { FillProperties, ShapeProperties, StrokeProperties } from '../model/properties/model-element-properties';
 import { ColorFactory } from '../model/color/color-factory';
 import { ContextColor } from '../model/color/context-color';
+import { ShapePropertiesComponentInterface } from './shape-properties-component-interface';
 
 export interface ShapePropertiesComponentValue {
 	opacity: number;
@@ -56,16 +57,13 @@ class LineJoinAction extends SimpleAction<ShapePropertiesComponent>{
 	styleUrls: ['./shape-properties.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ShapePropertiesComponent implements AfterViewInit, OnInit {
+export class ShapePropertiesComponent implements AfterViewInit, OnInit, ShapePropertiesComponentInterface {
 
 	@Input('fill')
 	enableFill: boolean = true;
 
 	@Input('line-join')
 	enableLineJoin = true;
-
-	@Input('line-cap')
-	enableLineCap = true;
 
 	@Input('global')
 	global = false;
@@ -78,6 +76,18 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 
 	@ViewChild('dashArray')
 	dashArrayElement: ElementRef<SVGLineElement> | undefined
+
+	@Output('fill-change')
+	onFillChange = new EventEmitter<FillProperties>();
+
+	@Output('stroke-change')
+	onStrokeChange = new EventEmitter<StrokeProperties>();
+
+	@Output('shape-change')
+	onShapeChange = new EventEmitter<ShapeProperties>();
+
+	@Output('line-join-change')
+	onLineJoinChange = new EventEmitter<LineJoin>();
 
 	readonly actionJoinArcs: Action;
 	readonly actionJoinBevel: Action;
@@ -99,6 +109,7 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 		const v = this.value;
 		v.fill = p.color;
 		this.value = v;
+		this.updateSvgs();
 	}
 
 	get shapeProperties(): ShapeProperties {
@@ -111,7 +122,7 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 
 	set shapeProperties(p: ShapeProperties) {
 		const v = this.value;
-		v.opacity = p.opacity;
+		v.opacity = p.opacity * 100;
 		v.vectorEffect = p.vectorEffect;
 		this.value = v;
 	}
@@ -120,7 +131,8 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 		const v = this.value;
 		return {
 			color: v.stroke,
-			linePattern: new LinePattern(v.dashArray, v.strokeWidth)
+			linePattern: new LinePattern(v.dashArray, v.strokeWidth),
+			lineCap: v.lineCap
 		};
 	}
 
@@ -129,7 +141,9 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 		v.stroke = p.color;
 		v.dashArray = p.linePattern.array.slice(0);
 		v.strokeWidth = p.linePattern.width;
+		v.lineCap = p.lineCap;
 		this.value = v;
+		this.updateSvgs();
 	}
 
 	get lineCap(): LineCap {
@@ -140,6 +154,7 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 		const v = this.value;
 		v.lineCap = c;
 		this.value = v;
+		this.onStrokeChange.emit(this.strokeProperties);
 	}
 
 	get lineJoin(): LineJoin {
@@ -150,6 +165,7 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 		const v = this.value;
 		v.lineJoin = j;
 		this.value = v;
+		this.onLineJoinChange.emit(j);
 	}
 
 	private get value(): ShapePropertiesComponentValue {
@@ -220,6 +236,7 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 				v.fill = value;
 				this.value = v;
 				this.updateSvgs();
+				this.onFillChange.emit(this.fillProperties);
 			}
 		});
 	}
@@ -231,6 +248,7 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 				v.stroke = value;
 				this.value = v;
 				this.updateSvgs();
+				this.onStrokeChange.emit(this.strokeProperties);
 			}
 		});
 	}
@@ -243,8 +261,21 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit {
 				v.strokeWidth = value.width;
 				this.value = v;
 				this.updateSvgs();
+				this.onStrokeChange.emit(this.strokeProperties);
 			}
 		});
+	}
+
+	onChangeLineWidth() {
+		this.onStrokeChange.emit(this.strokeProperties);
+	}
+
+	onChangeOpacity() {
+		this.onShapeChange.emit(this.shapeProperties);
+	}
+
+	onChangeVectorEffect() {
+		this.onShapeChange.emit(this.shapeProperties);
 	}
 
 	private updateSvgs() {
