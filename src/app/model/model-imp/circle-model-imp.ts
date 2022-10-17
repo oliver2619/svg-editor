@@ -2,13 +2,12 @@ import { ShapeModelImp } from './shape-model-imp';
 import { ShapeModelType } from '../shape-model';
 import { FillModelImp } from './fill-model-imp';
 import { StrokeModelImp } from './stroke-model-imp';
-import { CircleProperties, FillProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
+import { CircleProperties } from '../properties/model-element-properties';
 import { ShapeContainerBuilder } from '../svg-builder/shape-container-builder';
 import { Coordinate } from '../coordinate';
 import { PathProperties } from '../properties/path-properties';
 import { PathPropertiesBuilder } from '../properties/path-properties-builder';
 import { ComponentRef, ViewContainerRef } from '@angular/core';
-import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
 import { MutableSvgModel } from '../svg-model';
 import { SelectedCirclePropertiesComponent } from 'src/app/selection-properties/selected-circle-properties/selected-circle-properties.component';
 
@@ -41,27 +40,10 @@ export class CircleModelImp extends ShapeModelImp {
 
 	createPropertiesComponent(container: ViewContainerRef, model: MutableSvgModel): ComponentRef<any> {
 		const ret = container.createComponent(SelectedCirclePropertiesComponent);
-		ret.instance.fillProperties = this.fill.getMnemento();
-		ret.instance.strokeProperties = this.stroke.getMnemento();
-		ret.instance.shapeProperties = this.getMnemento();
-		ret.instance.onFillChange.subscribe({
-			next: (fill: FillProperties) => {
-				const p = this.getMnemento();
-				p.fill = fill;
-				model.setShapeMnemento(this.id, p);
-			}
-		});
-		ret.instance.onStrokeChange.subscribe({
-			next: (stroke: StrokeProperties) => {
-				const p = this.getMnemento();
-				p.stroke = stroke;
-				model.setShapeMnemento(this.id, p);
-			}
-		});
-		ret.instance.onShapeChange.subscribe({
-			next: (shape: ShapeProperties) => {
-				const p = { ...this.getMnemento(), ...shape };
-				model.setShapeMnemento(this.id, p);
+		ret.instance.properties = this.getMnemento();
+		ret.instance.onCircleChange.subscribe({
+			next: (circle: CircleProperties) => {
+				model.setShapeMnemento(this.id, circle);
 			}
 		});
 		return ret;

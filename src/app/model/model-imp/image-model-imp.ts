@@ -4,8 +4,8 @@ import { ImageProperties } from '../properties/model-element-properties';
 import { BoxShapeModelImp } from './box-shape-model-imp';
 import { PathProperties } from '../properties/path-properties';
 import { ComponentRef, ViewContainerRef } from '@angular/core';
-import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
 import { MutableSvgModel } from '../svg-model';
+import { SelectedImagePropertiesComponent } from 'src/app/selection-properties/selected-image-properties/selected-image-properties.component';
 
 export class ImageModelImp extends BoxShapeModelImp {
 
@@ -29,11 +29,16 @@ export class ImageModelImp extends BoxShapeModelImp {
 	}
 
 	createPropertiesComponent(container: ViewContainerRef, model: MutableSvgModel): ComponentRef<any> {
-		const ret = container.createComponent(ShapePropertiesComponent);
-		ret.instance;
+		const ret = container.createComponent(SelectedImagePropertiesComponent);
+		ret.instance.properties = this.getMnemento();
+		ret.instance.onImageChange.subscribe({
+			next: (img: ImageProperties) => {
+				model.setShapeMnemento(this.id, img);
+			}
+		});
 		return ret;
 	}
-	
+
 	getConvertToPathProperties(): PathProperties {
 		throw new Error('Image can\'t be converted to a path');
 	}

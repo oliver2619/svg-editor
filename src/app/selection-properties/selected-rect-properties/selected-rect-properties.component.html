@@ -1,1 +1,11 @@
-<p>selected-rect-properties works!</p>
+<se-shape-properties [fill]="true" [line-join]="true"></se-shape-properties>
+<form [formGroup]="formGroup">
+	<div class="form-group">
+		<label seText="tool.rect.rx"></label>
+		<input formControlName="rx" (change)="onChangeRx()" type="number" min="0" max="99999">
+	</div>
+	<div class="form-group">
+		<label seText="tool.rect.ry"></label>
+		<input formControlName="ry" (change)="onChangeRy()" type="number" min="0" max="99999">
+	</div>
+</form>

@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ChangeDetectorRef, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+
+export interface ImagePreviewComponentEvent {
+	name: string;
+	url: string;
+	image: HTMLImageElement;
+}
 
 @Component({
 	selector: 'se-image-preview',
@@ -13,6 +19,12 @@ export class ImagePreviewComponent implements OnChanges {
 	@Input('src')
 	imageUrl: string = '';
 
+	@Output('upload-image')
+	readonly onUploadImage = new EventEmitter<ImagePreviewComponentEvent>();
+
+	@ViewChild('fileUpload')
+	private fileUpload: ElementRef<HTMLInputElement> | undefined;
+	
 	width: number = 0;
 	height: number = 0;
 
@@ -30,6 +42,36 @@ export class ImagePreviewComponent implements OnChanges {
 				this.updateSize(image);
 			}
 		}
+	}
+
+	upload() {
+		if (this.fileUpload !== undefined) {
+			this.fileUpload.nativeElement.click();
+		}
+	}
+
+	onInput() {
+		const files: FileList | null = (this.fileUpload as ElementRef<HTMLInputElement>).nativeElement.files;
+		if (files !== null && files.length === 1) {
+			const file = files[0];
+			const reader = new FileReader();
+			reader.onload = ev => {
+				this.setImage(reader.result as string, file.name);
+			};
+			reader.readAsDataURL(file)
+		}
+	}
+
+	private setImage(dataUrl: string, name: string) {
+		const image = new Image();
+		image.src = dataUrl;
+		image.onload = () => {
+			this.onUploadImage.emit({
+				image,
+				name,
+				url: dataUrl
+			});
+		};
 	}
 
 	private updateSize(image: HTMLImageElement) {

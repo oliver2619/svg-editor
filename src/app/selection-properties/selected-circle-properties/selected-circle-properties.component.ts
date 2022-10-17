@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, ViewChild } from '@angular/core';
-import { FillProperties, ShapeProperties, StrokeProperties } from 'src/app/model/properties/model-element-properties';
+import { CircleProperties, FillProperties, ShapeProperties, StrokeProperties } from 'src/app/model/properties/model-element-properties';
 import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
 
 @Component({
@@ -10,31 +10,34 @@ import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-propert
 })
 export class SelectedCirclePropertiesComponent implements AfterViewInit {
 
-  readonly onFillChange = new EventEmitter<FillProperties>();
-  readonly onStrokeChange = new EventEmitter<StrokeProperties>();
-  readonly onShapeChange = new EventEmitter<ShapeProperties>();
-
-  fillProperties: FillProperties | undefined;
-  shapeProperties: ShapeProperties | undefined;
-  strokeProperties: StrokeProperties | undefined;
-
   @ViewChild(ShapePropertiesComponent)
   shapePropertiesComponent: ShapePropertiesComponent | undefined;
 
-  constructor() { }
+  readonly onCircleChange = new EventEmitter<CircleProperties>();
+
+  properties: CircleProperties | undefined;
 
   ngAfterViewInit(): void {
-    if (this.fillProperties !== undefined) {
-      this.shapePropertiesComponent!.fillProperties = this.fillProperties;
-    }
-    if (this.shapeProperties !== undefined) {
-      this.shapePropertiesComponent!.shapeProperties = this.shapeProperties;
-    }
-    if (this.strokeProperties !== undefined) {
-      this.shapePropertiesComponent!.strokeProperties = this.strokeProperties;
-    }
-    this.shapePropertiesComponent!.onFillChange.subscribe({ next: (p: FillProperties) => this.onFillChange.emit(p) });
-    this.shapePropertiesComponent!.onStrokeChange.subscribe({ next: (p: StrokeProperties) => this.onStrokeChange.emit(p) });
-    this.shapePropertiesComponent!.onShapeChange.subscribe({ next: (p: ShapeProperties) => this.onShapeChange.emit(p) });
+    this.shapePropertiesComponent!.fillProperties = { ...this.properties!.fill };
+    this.shapePropertiesComponent!.shapeProperties = { ...this.properties! };
+    this.shapePropertiesComponent!.strokeProperties = { ...this.properties!.stroke };
+    this.shapePropertiesComponent!.onFillChange.subscribe({
+      next: (p: FillProperties) => {
+        this.properties!.fill = p;
+        this.onCircleChange.emit({ ...this.properties! });
+      }
+    });
+    this.shapePropertiesComponent!.onStrokeChange.subscribe({
+      next: (p: StrokeProperties) => {
+        this.properties!.stroke = p;
+        this.onCircleChange.emit({ ...this.properties! });
+      }
+    });
+    this.shapePropertiesComponent!.onShapeChange.subscribe({
+      next: (p: ShapeProperties) => {
+        this.properties = { ...this.properties!, ...p }
+        this.onCircleChange.emit({ ...this.properties! });
+      }
+    });
   }
 }

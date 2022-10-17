@@ -80,11 +80,11 @@ import { SelectedRectPropertiesComponent } from './selection-properties/selected
 		ToolHelpComponent,
 		HelpAboutComponent,
 		HelpShortcutsComponent,
-  EditGeometryComponent,
-  SelectedEllipsePropertiesComponent,
-  SelectedCirclePropertiesComponent,
-  SelectedImagePropertiesComponent,
-  SelectedRectPropertiesComponent
+		EditGeometryComponent,
+		SelectedEllipsePropertiesComponent,
+		SelectedCirclePropertiesComponent,
+		SelectedImagePropertiesComponent,
+		SelectedRectPropertiesComponent
 	],
 	imports: [
 		BrowserModule,

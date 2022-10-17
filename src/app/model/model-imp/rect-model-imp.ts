@@ -1,7 +1,7 @@
 import { ComponentRef, ViewContainerRef } from '@angular/core';
-import { ShapePropertiesComponent } from 'src/app/shape-properties/shape-properties.component';
+import { SelectedRectPropertiesComponent } from 'src/app/selection-properties/selected-rect-properties/selected-rect-properties.component';
 import { LineJoin } from '../line-properties';
-import { FillProperties, RectProperties, ShapeProperties, StrokeProperties } from '../properties/model-element-properties';
+import { RectProperties } from '../properties/model-element-properties';
 import { PathProperties } from '../properties/path-properties';
 import { PathPropertiesBuilder } from '../properties/path-properties-builder';
 import { ShapeModelType } from '../shape-model';
@@ -42,38 +42,11 @@ export class RectModelImp extends BoxShapeModelImp {
 	}
 
 	createPropertiesComponent(container: ViewContainerRef, model: MutableSvgModel): ComponentRef<any> {
-		const ret = container.createComponent(ShapePropertiesComponent);
-		ret.setInput('fill', true);
-		ret.setInput('line-join', true);
-		ret.instance.fillProperties = this.fill.getMnemento();
-		ret.instance.strokeProperties = this.stroke.getMnemento();
-		ret.instance.shapeProperties = this.getMnemento();
-		ret.instance.lineJoin = this.getMnemento().lineJoin;
-		ret.instance.onFillChange.subscribe({
-			next: (fill: FillProperties) => {
-				const p = this.getMnemento();
-				p.fill = fill;
-				model.setShapeMnemento(this.id, p);
-			}
-		});
-		ret.instance.onStrokeChange.subscribe({
-			next: (stroke: StrokeProperties) => {
-				const p = this.getMnemento();
-				p.stroke = stroke;
-				model.setShapeMnemento(this.id, p);
-			}
-		});
-		ret.instance.onShapeChange.subscribe({
-			next: (shape: ShapeProperties) => {
-				const p = { ...this.getMnemento(), ...shape };
-				model.setShapeMnemento(this.id, p);
-			}
-		});
-		ret.instance.onLineJoinChange.subscribe({
-			next: (lineJoin: LineJoin) => {
-				const p = this.getMnemento();
-				p.lineJoin = lineJoin;
-				model.setShapeMnemento(this.id, p);
+		const ret = container.createComponent(SelectedRectPropertiesComponent);
+		ret.instance.properties = this.getMnemento();
+		ret.instance.onRectChange.subscribe({
+			next: (rect: RectProperties) => {
+				model.setShapeMnemento(this.id, rect);
 			}
 		});
 		return ret;

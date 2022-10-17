@@ -1,1 +1,2 @@
-<div class="imageUpload"><img *ngIf="hasImage" [src]="imageUrl" [width]="width" [height]="height"></div>
+<a href="javascript:" (click)="upload()"><div class="imageUpload"><img *ngIf="hasImage" [src]="imageUrl" [width]="width" [height]="height"></div></a>
+<input #fileUpload type="file" (change)="onInput()" accept=".png,.jpg,.jpeg" style="position: absolute; visibility: hidden">

@@ -151,7 +151,7 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit, ShapePro
 	}
 
 	set lineCap(c: LineCap) {
-		const v = this.value;
+		const v = {...this.value};
 		v.lineCap = c;
 		this.value = v;
 		this.onStrokeChange.emit(this.strokeProperties);
@@ -162,7 +162,7 @@ export class ShapePropertiesComponent implements AfterViewInit, OnInit, ShapePro
 	}
 
 	set lineJoin(j: LineJoin) {
-		const v = this.value;
+		const v = {...this.value};
 		v.lineJoin = j;
 		this.value = v;
 		this.onLineJoinChange.emit(j);

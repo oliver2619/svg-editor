@@ -1,9 +1,4 @@
-## important (20)
-* selection properties
-	* circle: r
-	* ellipse: rx, ry, rotation, shape
-	* image: url, embedded, rotation, opacity
-	* rect: rx, ry, width, height, rotation, shape
+## important (16)
 * linear gradient
 * radial gradient
 * pattern
@@ -42,16 +37,22 @@
 * image link
 * clipping paths: crop image, move shape with clipping path: what happens?
 
+## layers (2)
+* new group, delete, rename, up, down, duplicate, merge down, (merge all)
+* object properties: id, class, visible(hidden, visible, exclusive), rotation angle, gaussian blur value, x, y, width, height, border-radius, fill color, strike color, strike style, line join, line cap, opacity, vector-settings
+
+# Bugs (2)
+* undo insert shape / redo remove group: when shape is selected causes error
+* box shapes: ViewService.getElementsContainingPoint and ViewService.getSelectionBoundingBox is not correct with transformations
+* selectedShapePropertiesComponent: LineCap/join initially not updated correctly
+
 ## other useful functions
 * create noise in shape
 * create hairs
 ...
 
-## layers (2)
-* new group, delete, rename, up, down, duplicate, merge down, (merge all)
-* object properties: id, class, visible(hidden, visible, exclusive), rotation angle, gaussian blur value, x, y, width, height, border-radius, fill color, strike color, strike style, line join, line cap, opacity, vector-settings
-
-## other (14)
+## other (15)
+* some form layout: inline instead of row
 * miniview (show visible part, scroll)
 * shortcuts
 * clip path list
@@ -79,7 +80,3 @@
 * Edit SVG
 * editor settings: background, unit (px, pt, em, ex, mm, cm, in), grid color
 * auswahl invertieren (why and how?)
-
-# Bugs (2)
-* undo insert shape / redo remove group: when shape is selected causes error
-* box shapes: ViewService.getElementsContainingPoint and ViewService.getSelectionBoundingBox is not correct with transformations

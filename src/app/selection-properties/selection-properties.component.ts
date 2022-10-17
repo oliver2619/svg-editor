@@ -37,14 +37,17 @@ export class SelectionPropertiesComponent implements AfterViewInit, OnDestroy {
 
   private afterSelectionChange() {
     const shapes = this.viewService.getSelectedShapes();
-    this.selectedShape = shapes.length === 1 ? shapes[0] : undefined;
-    if (this.propertiesComponent !== undefined) {
-      this.propertiesComponent.destroy();
-      this.propertiesComponent = undefined;
-    }
-    if (this.propertiesContainer !== undefined && this.selectedShape !== undefined) {
-      this.propertiesComponent = this.selectedShape.createPropertiesComponent(this.propertiesContainer, this.viewService.modelService);
-      this.changeDetectorRef.markForCheck();
+    const shape = shapes.length === 1 ? shapes[0] : undefined;
+    if (shape?.id !== this.selectedShape?.id) {
+      this.selectedShape = shape;
+      if (this.propertiesComponent !== undefined) {
+        this.propertiesComponent.destroy();
+        this.propertiesComponent = undefined;
+      }
+      if (this.propertiesContainer !== undefined && this.selectedShape !== undefined) {
+        this.propertiesComponent = this.selectedShape.createPropertiesComponent(this.propertiesContainer, this.viewService.modelService);
+        this.changeDetectorRef.markForCheck();
+      }
     }
   }
 }

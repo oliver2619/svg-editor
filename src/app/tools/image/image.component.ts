@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { GroupBuilder } from 'src/app/model/svg-builder/group-builder';
 import { ViewService } from 'src/app/view/view.service';
 import { ImageBuilder } from 'src/app/model/svg-builder/image-builder';
+import { ImagePreviewComponentEvent } from 'src/app/shared/image-preview/image-preview.component';
 
 export class ImageTool extends AbstractDrawTool {
 
@@ -81,9 +82,6 @@ interface ImageComponentValue {
 })
 export class ImageComponent {
 
-	@ViewChild('fileUpload')
-	private fileUpload: ElementRef<HTMLInputElement> | undefined;
-
 	readonly formGroup: FormGroup;
 
 	get aspect(): number {
@@ -127,38 +125,16 @@ export class ImageComponent {
 		this.formGroup.addControl('height', formBuilder.control(0, [Validators.required]));
 		this.formGroup.addControl('url', formBuilder.control('', [Validators.required]));
 		this.formGroup.addControl('opacity', formBuilder.control(100, [Validators.required]));
-		this.formGroup.addControl('preserveAspectRatio', formBuilder.control(false, []));
+		this.formGroup.addControl('preserveAspectRatio', formBuilder.control(true, []));
 	}
 
-	onInput() {
-		const files: FileList | null = (this.fileUpload as ElementRef<HTMLInputElement>).nativeElement.files;
-		if (files !== null && files.length === 1) {
-			const file = files[0];
-			const reader = new FileReader();
-			reader.onload = ev => {
-				this.setImage(reader.result as string, file.name);
-			};
-			reader.readAsDataURL(file)
-		}
-	}
-
-	upload() {
-		if (this.fileUpload !== undefined) {
-			this.fileUpload.nativeElement.click();
-		}
-	}
-
-	private setImage(dataUrl: string, name: string) {
+	onUploadImage(ev: ImagePreviewComponentEvent) {
 		const v: ImageComponentValue = this.formGroup.value;
-		v.name = name;
-		v.url = dataUrl;
-		const image = new Image();
-		image.src = dataUrl;
-		image.onload = () => {
-			v.width = image.width;
-			v.height = image.height;
-			this.formGroup.setValue(v);
-			this.changeDetector.markForCheck();
-		}
+		v.name = ev.name;
+		v.url = ev.url;
+		v.width = ev.image.width;
+		v.height = ev.image.height;
+		this.formGroup.setValue(v);
+		this.changeDetector.markForCheck();
 	}
 }

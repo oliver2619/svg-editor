@@ -60,6 +60,7 @@ export abstract class BoxShapeModelImp extends ShapeModelImp {
     }
 
     override setMnemento(m: BoxProperties) {
+        super.setMnemento(m);
         this.x = m.x;
         this.y = m.y;
         this.width = m.width;

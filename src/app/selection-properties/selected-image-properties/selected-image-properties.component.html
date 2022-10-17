@@ -1,1 +1,12 @@
-<p>selected-image-properties works!</p>
+<form [formGroup]="formGroup">
+	<div class="form-group">
+		<se-image-preview [src]="imageUrl" (upload-image)="onUploadImage($event)"></se-image-preview>
+	</div>
+	<div class="form-group button-list">
+		<label><input type="checkbox" formControlName="preserveAspectRatio" (change)="onChangePreserveAspectRatio()">&nbsp;<span seText="tool.image.preserveAspectRatio"></span></label>
+	</div>
+	<div class="form-group">
+		<label seText="opacity"></label>
+		<se-slider-input unit="%" [control]="formGroup.controls['opacity']" [min]="0" [max]="100" (value-change)="onChangeOpacity($event)"></se-slider-input>
+	</div>
+</form>
