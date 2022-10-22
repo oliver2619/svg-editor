@@ -1,4 +1,4 @@
-## important (16)
+## important (17)
 * linear gradient
 * radial gradient
 * pattern
@@ -17,6 +17,7 @@
 	* rescale
 	* fit to content
 * layer view: nested groups
+* effects
 
 ## Tools (6)
 * insert library element -> list of objects -> mouse
@@ -39,12 +40,13 @@
 
 ## layers (2)
 * new group, delete, rename, up, down, duplicate, merge down, (merge all)
-* object properties: id, class, visible(hidden, visible, exclusive), rotation angle, gaussian blur value, x, y, width, height, border-radius, fill color, strike color, strike style, line join, line cap, opacity, vector-settings
+* object properties: id, class, visible(hidden, visible, exclusive), rotation angle, effects (gaussian blur value), x, y, width, height
 
 # Bugs (2)
 * undo insert shape / redo remove group: when shape is selected causes error
 * box shapes: ViewService.getElementsContainingPoint and ViewService.getSelectionBoundingBox is not correct with transformations
 * selectedShapePropertiesComponent: LineCap/join initially not updated correctly
+* nested dialogs are not modal (select color at color stop)
 
 ## other useful functions
 * create noise in shape

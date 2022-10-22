@@ -1,20 +1,23 @@
-import { ColorStop } from './color-stop';
 import { Coordinate } from '../coordinate';
-import { ModelElement } from '../model-element';
 import { DefsBuilder } from '../svg-builder/defs-builder';
+import { Gradient, GradientProperties } from './gradient';
 
-export type SpreadMethod = 'pad' | 'reflect' | 'repeat';
+export interface LinearGradientProperties extends GradientProperties {
+	start: Coordinate;
+	end: Coordinate;
+}
 
-export class LinearGradient implements ModelElement<DefsBuilder> {
+export class LinearGradient extends Gradient {
 
-	private stops: ColorStop[] = [];
 
-	constructor(readonly id: string, public spreadMethod: SpreadMethod, public start: Coordinate, public end: Coordinate) { }
+	constructor(properties: LinearGradientProperties, public start: Coordinate, public end: Coordinate) {
+		super(properties);
+	}
 
 	buildSvg(builder: DefsBuilder): void {
 		const gradient = builder.linearGradient(this.id);
 		gradient.setPath(this.start, this.end);
-		gradient.setSpreadMethod(this.spreadMethod);
-		this.stops.forEach(s => gradient.addColorStop(s.offset, s.color.html, s.color.alpha));
+		this.buildProperties(gradient);
+		this.buildColorStops(gradient);
 	}
 }

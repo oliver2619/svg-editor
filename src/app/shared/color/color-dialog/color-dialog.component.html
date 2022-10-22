@@ -1,8 +1,3 @@
 <se-dialog [title]="title" buttons="ok cancel" (ok)="ok()" (cancel)="cancel()">
-	<se-tab-control>
-		<se-tab title="{{'colorDialog.single' | text}}"></se-tab>
-		<se-tab title="{{'colorDialog.linearGradient' | text}}"></se-tab>
-		<se-tab title="{{'colorDialog.radialGradient' | text}}"></se-tab>
-		<se-tab title="{{'colorDialog.pattern' | text}}"></se-tab>
-	</se-tab-control>
+	<se-color [color]="singleColor" (color-change)="onSingleColorChange($event)"></se-color>
 </se-dialog>

@@ -4,6 +4,7 @@ import { ModalService } from '../modal.service';
 import { ColorDialogComponent } from './color-dialog/color-dialog.component';
 import { ColorPatternDialogComponent } from './color-pattern-dialog/color-pattern-dialog.component';
 import { Color } from 'src/app/model/color/color';
+import { SingleColor } from 'src/app/model/color/single-color';
 
 @Injectable({
 	providedIn: 'root'
@@ -12,7 +13,7 @@ export class ColorService {
 
 	constructor(private readonly modalService: ModalService) { }
 
-	pickColor(color: string, title: string): Observable<string> {
+	pickColor(color: SingleColor, title: string): Observable<SingleColor> {
 		return this.modalService.showDialog(ColorDialogComponent, color, title);
 	}
 

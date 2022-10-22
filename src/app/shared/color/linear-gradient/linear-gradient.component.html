@@ -1,1 +1,36 @@
-<p>linear-gradient works!</p>
+<form [formGroup]="formGroup">
+    <div class="form-group">
+        <svg xmlns="http://www.w3.org/2000/svg" width="440" height="440" viewBox="0 0 440 440">
+            <defs>
+                <linearGradient #gradient id="gradient"></linearGradient>
+            </defs>
+            <rect #rect x="60" y="60" width="320" height="320" fill="url('#gradient')" stroke="black" stroke-width="1"/>
+            <circle #start cx="0" cy="0" r="10"/>
+            <circle #end cx="0" cy="0" r="10"/>
+        </svg>
+        <small seText="linearGradient.help"></small>
+    </div>
+    <div class="form-group">
+        <svg xmlns="http://www.w3.org/2000/svg" width="440" height="32" viewBox="0 0 440 32">
+            <defs>
+                <linearGradient #gradient2 id="gradient2"></linearGradient>
+            </defs>
+            <rect x="20" y="0" width="400" height="32" fill="url('#gradient2')" stroke="none" stroke-width="1" (pointerdown)="onInsertStop($event)"/>
+            <g #colorStops></g>
+        </svg>
+        <small seText="colorStops.help"></small>
+    </div>
+    <div class="form-group">
+        <label seText="gradient.spreadMethod"></label>
+        <select formControlName="spreadMethod" (change)="onChangeSpreadMethod()">
+            <option value="pad" seText="gradient.spreadMethod.pad"></option>
+            <option value="reflect" seText="gradient.spreadMethod.reflect"></option>
+            <option value="repeat" seText="gradient.spreadMethod.repeat"></option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label seText="opacity"></label>
+        <se-slider-input [control]="formGroup.controls['opacity']" (value-changing)="onChangeOpacity()"></se-slider-input>
+    </div>
+</form>
+<se-linear-gradient-list></se-linear-gradient-list>

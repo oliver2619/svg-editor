@@ -25,6 +25,9 @@ export class SliderInputComponent implements OnChanges {
 	@Output('value-change')
 	onValueChange = new EventEmitter<number>();
 
+	@Output('value-changing')
+	onValueChanging = new EventEmitter<number>();
+
 	private controlSubscription: Subscription | undefined;
 
 	sliderControl: FormControl<number>;
@@ -68,5 +71,6 @@ export class SliderInputComponent implements OnChanges {
 	onSliderInput(e: HTMLInputElement) {
 		const v = Number(e.value);
 		this.numberControl!.setValue(v);
+		this.onValueChanging.emit(v);
 	}
 }

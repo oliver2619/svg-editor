@@ -26,6 +26,7 @@ import { ImagePreviewComponent } from './image-preview/image-preview.component';
 import { ErrorMessageComponent } from './error/error-message/error-message.component';
 import { ErrorStackComponent } from './error/error-stack/error-stack.component';
 import { SvgEditorErrorHandler } from './error/error-handler';
+import { LinearGradientListComponent } from './color/linear-gradient/linear-gradient-list/linear-gradient-list.component';
 
 @NgModule({
 	declarations: [
@@ -52,7 +53,8 @@ import { SvgEditorErrorHandler } from './error/error-handler';
 		ShortcutDirective,
 		ImagePreviewComponent,
 		ErrorMessageComponent,
-		ErrorStackComponent
+		ErrorStackComponent,
+		LinearGradientListComponent
 	],
 	imports: [
 		CommonModule,
